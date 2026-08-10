@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Laporan Variance — Inventory ABBQ</title>
+<link rel="icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#B0281C; --accent-tint:#FBE7E4; }
+  thead th{background:var(--accent-tint);}
+  .row-flag{background:#FCEBE9 !important;}
+  .filter-toggle{
+    display:flex;gap:8px;margin-bottom:10px;
+  }
+  .filter-toggle button{
+    flex:1;padding:9px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card);font-weight:700;font-size:12px;cursor:pointer;color:var(--muted);
+  }
+  .filter-toggle button.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">ABBQ Indonesia</div>
+    <div class="topbar-h1">Laporan Variance</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <div class="panel-title">Business Date Berjalan</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div style="font-size:22px;font-weight:800;" id="bizDateDisplay">–</div>
+      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px;" onclick="toggleManualDateEdit()">Ubah Manual</button>
+    </div>
+    <div id="manualDateEdit" style="display:none;margin-top:12px;">
+      <div class="field">
+        <label>Set Business Date Manual</label>
+        <input type="date" id="manualBizDate">
+      </div>
+      <button class="btn btn-secondary" onclick="saveManualBizDate()">Simpan Business Date</button>
+      <p style="font-size:11px;color:var(--muted);margin-top:8px;">Gunakan ini hanya untuk perbaikan/setup awal. Normalnya business date maju otomatis setelah Anda menekan "Tutup Hari Ini".</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">1. Periode Transaksi (Barang Masuk / Transfer / Waste)</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal</label>
+        <input type="date" id="periodStart" onchange="onPeriodChange()">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal</label>
+        <input type="date" id="periodEnd" onchange="onPeriodChange()">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">2. Opening Stock</div>
+    <div id="openingAutoBox" style="display:none;">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">
+        ✓ Otomatis terisi dari input Stock Opname terakhir tanggal <b id="openingAutoDate">-</b>
+        (<span id="openingAutoCount">0</span> item).
+      </p>
+      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px;" onclick="useManualOpening()">Pakai Sesi Stock Opname Manual Sebagai Gantinya</button>
+    </div>
+    <div id="openingManualBox">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Tanggal sebelum periode ini belum di-EOD. Pilih 1 atau lebih sesi manual sebagai stok awal periode.</p>
+      <div class="sess-list" id="openingList"></div>
+      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px;margin-top:10px;display:none;" id="backToAutoBtn" onclick="useAutoOpening()">← Kembali ke Otomatis</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">3. Ending Stock</div>
+    <div id="endingAutoBox" style="display:none;">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">
+        ✓ Otomatis terisi dari input Stock Opname terakhir tanggal <b id="endingAutoDate">-</b>
+        (<span id="endingAutoCount">0</span> item).
+      </p>
+      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px;" onclick="useManualEnding()">Pakai Sesi Stock Opname Manual Sebagai Gantinya</button>
+    </div>
+    <div id="endingManualBox">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Tanggal akhir periode ini belum di-EOD (End of Day). Pilih 1 atau lebih sesi manual sebagai hasil stock opname akhir.</p>
+      <div class="sess-list" id="endingList"></div>
+      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px;margin-top:10px;display:none;" id="backToAutoEndingBtn" onclick="useAutoEnding()">← Kembali ke Otomatis</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">4. Data Usage (Import Penjualan)</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Otomatis mencakup semua import usage yang rentang tanggalnya tumpang tindih dengan periode di atas.</p>
+    <div id="usageAutoList" style="font-size:13px;color:var(--muted);">-</div>
+  </div>
+
+  <button class="btn btn-primary" onclick="calculateVariance()" style="margin-bottom:16px;">Hitung Variance</button>
+
+  <div id="resultSection" style="display:none;">
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">Total Item Dihitung</div>
+        <div class="summary-value" id="sumTotalItems">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Item Ada Variance</div>
+        <div class="summary-value neg" id="sumVarianceItems">0</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Tampilkan</div>
+      <div class="filter-toggle">
+        <button class="active" id="showAll" onclick="setFilter('all')">Semua Item</button>
+        <button id="showVarOnly" onclick="setFilter('variance')">Hanya Ada Variance</button>
+      </div>
+      <div class="field">
+        <input type="text" id="searchResult" placeholder="Cari kode atau nama item..." oninput="renderTable()">
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-bottom:16px;">
+      <button class="btn btn-secondary" onclick="exportExcel()">⬇ Export ke Excel</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Kode</th><th>Nama Item</th><th>UOM</th>
+            <th class="num">Opening</th>
+            <th class="num">In CK</th>
+            <th class="num">In Supplier</th>
+            <th class="num">Transfer In</th>
+            <th class="num">Transfer Out</th>
+            <th class="num">Waste</th>
+            <th class="num">Usage</th>
+            <th class="num">Expected</th>
+            <th class="num">Ending (SO)</th>
+            <th class="num">Variance</th>
+          </tr>
+        </thead>
+        <tbody id="resultBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../shared/xlsx.full.min.js?v=31"></script>
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+<script src="../shared/seed-data.js?v=31"></script>
+<script src="../shared/ui-dialog.js?v=41"></script>
+<script src="app.js?v=31"></script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+[
+{
+"nomor":1,
+"kode":"120298",
+"item":"SAUCE TALIWANG 0.9KG/PAC",
+"konv":900,
+"uom":"G"
+},
+{
+"nomor":2,
+"kode":"120300",
+"item":"SAUCE KECOMBRANG 0.9KG/PAC",
+"konv":900,
+"uom":"G"
+},
+{
+"nomor":3,
+"kode":"120301",
+"item":"SAUCE SOLO 0.9KG/PAC",
+"konv":900,
+"uom":"G"
+},
+{
+"nomor":4,
+"kode":"120322",
+"item":"SAMBAL MATAH 174 PC/CTN",
+"konv":174,
+"uom":"PC"
+},
+{
+"nomor":5,
+"kode":"120324",
+"item":"SAMBAL KECOMBRANG 174 PC/CTN",
+"konv":174,
+"uom":"PC"
+},
+{
+"nomor":6,
+"kode":"120336",
+"item":"AYAM BAKAR (DADA 4 PAC X 12 PCS /CAR)",
+"konv":12,
+"uom":"PC"
+},
+{
+"nomor":7,
+"kode":"120337",
+"item":"AYAM BAKAR (PAHA 4 PAC X 12 PCS /CAR)",
+"konv":12,
+"uom":"PC"
+},
+{
+"nomor":8,
+"kode":"120339",
+"item":"SAYUR ASAM BASE 307GR/PAC",
+"konv":307,
+"uom":"PAC"
+},
+{
+"nomor":9,
+"kode":"120340",
+"item":"CORN RIBS 300GR/PAC",
+"konv":300,
+"uom":"PAC"
+},
+{
+"nomor":10,
+"kode":"120342",
+"item":"PERKEDEL 10PCS/PAC",
+"konv":10,
+"uom":"PC"
+},
+{
+"nomor":11,
+"kode":"120350",
+"item":"SPRING ROLL 350GR/PAC",
+"konv":350,
+"uom":"PAC"
+},
+{
+"nomor":12,
+"kode":"125008",
+"item":"SMOKE MEAT 500GR/PAC",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":13,
+"kode":"129000",
+"item":"AYAM CUB 3PACX10PCS/CAR",
+"konv":10,
+"uom":"PC"
+},
+{
+"nomor":14,
+"kode":"129001",
+"item":"AYAM CUK 5PACX8PCS/CAR",
+"konv":8,
+"uom":"PC"
+},
+{
+"nomor":15,
+"kode":"172004",
+"item":"CHEESE MOZARELLA 1KG/PAC",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":16,
+"kode":"175374",
+"item":"ABBQ G 500GR/PAC",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":17,
+"kode":"300173",
+"item":"MAYONNAISE",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":18,
+"kode":"300833",
+"item":"MILK UHT FULL CREAM GF",
+"konv":1000,
+"uom":"ML"
+},
+{
+"nomor":19,
+"kode":"301125",
+"item":"KERUPUK UDANG 380GR/PAC",
+"konv":380,
+"uom":"PAC"
+},
+{
+"nomor":20,
+"kode":"301169",
+"item":"EXTRA HOT BOTTLE J 330 ML",
+"konv":330,
+"uom":"ML"
+},
+{
+"nomor":21,
+"kode":"301180",
+"item":"KECAP MANIS BANGO (KG)",
+"konv":1500,
+"uom":"G"
+},
+{
+"nomor":22,
+"kode":"301543",
+"item":"TAHU 10 PC",
+"konv":10,
+"uom":"PC"
+},
+{
+"nomor":23,
+"kode":"301544",
+"item":"TEMPE 500 GRAM",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":24,
+"kode":"301588",
+"item":"TEPUNG TERIGU 1KG",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":25,
+"kode":"301634",
+"item":"BERAS PULEN 5 KG",
+"konv":5000,
+"uom":"G"
+},
+{
+"nomor":26,
+"kode":"301673",
+"item":"TEPUNG TAPIOKA",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":27,
+"kode":"301676",
+"item":"KERTAS BERAS",
+"konv":300,
+"uom":"G"
+},
+{
+"nomor":28,
+"kode":"301685",
+"item":"SAMBAL BANGKOK",
+"konv":400,
+"uom":"G"
+},
+{
+"nomor":29,
+"kode":"301692",
+"item":"BREAD CRUMBS",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":30,
+"kode":"301546",
+"item":"KERUPUK BAWAL PUTIH",
+"konv":380,
+"uom":"G"
+},
+{
+"nomor":31,
+"kode":"301577",
+"item":"EMPING MELINJO 1 KG",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":32,
+"kode":"300526",
+"item":"KETIMUN",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":33,
+"kode":"301640",
+"item":"KOL",
+"konv":1,
+"uom":"G"
+}
+]

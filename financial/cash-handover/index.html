@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Cash Handover — Financial ABBQ</title>
+<link rel="icon" href="../../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#0D7A5F; --accent-tint:#E2F5EF; }
+  thead th{background:var(--accent-tint);}
+  .hc-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .hc-table th, .hc-table td{padding:6px 3px;border-bottom:1px solid var(--line);text-align:right;overflow-wrap:break-word;box-sizing:border-box;}
+  .hc-table th:first-child, .hc-table td:first-child{text-align:left;}
+  .hc-table thead tr.group-row th{text-align:center;background:var(--accent-tint);font-size:10px;letter-spacing:.02em;text-transform:uppercase;}
+  .hc-table thead tr.group-row th.open-col{background:#DCEEFC;}
+  .hc-table thead tr.group-row th.close-col{background:#FDF3C7;}
+  .hc-table input{width:100%;border:1px solid var(--line);border-radius:6px;padding:4px 2px;font-size:12px;text-align:right;}
+  .hc-table .amount-cell{font-weight:600;}
+  .hc-table tr.total-row td{font-weight:800;background:#FBEBC7;}
+  .hc-table tr.expected-row td{font-weight:800;background:#FBEBC7;}
+  .hc-table tr.variance-row td{font-weight:800;background:#FBEBC7;}
+  .hc-table tr.total-row input, .hc-table tr.expected-row input{text-align:right;font-weight:800;background:#fff;}
+
+  /* Kolom Qty (open & close) dipersempit - jumlah lembar/koin biasanya
+     angka pendek, jadi tidak perlu selebar kolom Amount. Ini yang
+     bikin ke-5 kolom (Fractions, Qty x2, Amount x2) muat penuh di HP
+     tanpa perlu geser layar. */
+  .hc-table th:nth-child(1), .hc-table td:nth-child(1){ width:22%; }
+  .hc-table th:nth-child(2), .hc-table td:nth-child(2){ width:12%; }
+  .hc-table th:nth-child(3), .hc-table td:nth-child(3){ width:27%; }
+  .hc-table th:nth-child(4), .hc-table td:nth-child(4){ width:12%; }
+  .hc-table th:nth-child(5), .hc-table td:nth-child(5){ width:27%; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">Financial</div>
+    <div class="topbar-h1">Cash Handover</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <div class="field">
+      <label>Tanggal</label>
+      <input type="date" id="hcDate" onchange="loadForDate()">
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">💵 Handover Casheet</div>
+    <div class="table-wrap">
+      <table class="hc-table">
+        <thead>
+          <tr class="group-row">
+            <th></th>
+            <th class="open-col" colspan="2">Opening</th>
+            <th class="close-col" colspan="2">Closing</th>
+          </tr>
+          <tr>
+            <th>Fractions</th>
+            <th>Qty</th><th>Amount</th>
+            <th>Qty</th><th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="denomBody"></tbody>
+        <tbody>
+          <tr class="total-row">
+            <td>Total</td>
+            <td></td><td class="amount-cell" id="openTotal">0</td>
+            <td></td><td class="amount-cell" id="closeTotal">0</td>
+          </tr>
+          <tr class="expected-row">
+            <td>Expected</td>
+            <td></td><td><input type="number" id="openExpected" value="0" oninput="recalc()"></td>
+            <td></td><td><input type="number" id="closeExpected" value="0" oninput="recalc()"></td>
+          </tr>
+          <tr class="variance-row">
+            <td>Variance</td>
+            <td></td><td class="amount-cell" id="openVariance">0</td>
+            <td></td><td class="amount-cell" id="closeVariance">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">🪙 Handover Petty Cash</div>
+    <div class="field">
+      <label>Cash in Hand</label>
+      <div style="display:flex;gap:8px;align-items:stretch;">
+        <input type="number" id="pcCashInHand" value="0" oninput="recalc()" style="flex:1;">
+        <button type="button" class="btn btn-secondary" style="width:auto;padding:0 16px;" onclick="openMiniCalculator('pcCashInHand')">🧮</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Receipts <span style="font-weight:400;color:var(--muted);font-size:11px;">(otomatis dari Total Penggunaan Petty Cash yang belum di-reimburse - masih bisa diubah manual)</span></label>
+      <div style="display:flex;gap:8px;align-items:stretch;">
+        <input type="number" id="pcReceipts" value="0" oninput="recalc()" style="flex:1;">
+        <button type="button" class="btn btn-secondary" style="width:auto;padding:0 16px;" onclick="openMiniCalculator('pcReceipts')">🧮</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="hc-table">
+        <tbody>
+          <tr class="total-row"><td>Total PC</td><td class="amount-cell" id="pcTotal">0</td></tr>
+          <tr class="expected-row"><td>Expected</td><td><input type="number" id="pcExpected" value="0" oninput="recalc()"></td></tr>
+          <tr class="variance-row"><td>Variance</td><td class="amount-cell" id="pcVariance">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" onclick="saveHandover()">💾 Simpan Cash Handover</button>
+
+  <div class="panel" style="margin-top:20px;">
+    <div class="panel-title">Riwayat</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal</label>
+        <input type="date" id="histFrom">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal</label>
+        <input type="date" id="histTo">
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="loadHistory()">🔍 Tampilkan Riwayat</button>
+    <div class="table-wrap" style="margin-top:14px;">
+      <table>
+        <thead><tr><th>Tanggal</th><th class="num">Total Opening</th><th class="num">Total Closing</th><th class="num">Total PC</th><th></th></tr></thead>
+        <tbody id="histBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../../shared/local-db.js?v=1"></script>
+<script src="../../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 2;</script>
+<script src="../../shared/auth-guard.js?v=46"></script>
+<script src="../../shared/ui-dialog.js?v=41"></script>
+<script src="../../shared/mini-calculator.js?v=1"></script>
+<script src="app.js?v=3"></script>
+</body>
+</html>

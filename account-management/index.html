@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Kelola Akun — Inventory ABBQ</title>
+<link rel="icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#4A4A4A; --accent-tint:#ECECEC; }
+  .info-box{
+    background:#EAF3FF;border:1px solid #BFDBFE;border-radius:12px;
+    padding:12px 14px;font-size:12px;color:#1C3D6B;line-height:1.6;margin-bottom:14px;
+  }
+  .role-chip{
+    display:inline-block;padding:2px 9px;border-radius:999px;
+    font-size:11px;font-weight:700;background:#FDECC8;color:#8A5A00;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">ABBQ Indonesia</div>
+    <div class="topbar-h1">Kelola Akun</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <div class="panel-title">👤 Akun Saat Ini</div>
+    <div class="info-box">
+      Aplikasi ini berjalan dalam <b>Mode Offline</b> — semua data tersimpan di perangkat ini saja
+      (tidak memakai Firebase), dan hanya ada <b>1 akun</b>: Super Admin. Akun ini punya akses penuh
+      ke semua modul.
+    </div>
+    <table>
+      <tbody>
+        <tr><td style="width:140px;color:var(--muted);">Username</td><td><b id="meUsername">-</b></td></tr>
+        <tr><td style="color:var(--muted);">Role</td><td><span class="role-chip" id="meRole">Super Admin</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">🔑 Ganti Password</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+      Password ini tersimpan lokal di perangkat ini saja. Kalau lupa, hubungi developer aplikasi untuk
+      cara reset lewat penyimpanan lokal browser.
+    </p>
+    <div class="field">
+      <label>Password Saat Ini</label>
+      <input type="password" id="curPass" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Password Baru (min. 6 karakter)</label>
+      <input type="password" id="newPass" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Ulangi Password Baru</label>
+      <input type="password" id="newPass2" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" onclick="changeMyPassword()">Simpan Password Baru</button>
+    <div id="passResult" style="font-size:13px;margin-top:8px;"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">🏬 Kelola Outlet (opsional)</div>
+    <div class="info-box">
+      Daftar outlet ini opsional — hanya dipakai sebagai label/pengelompokan pada beberapa laporan.
+      Karena mode offline ini cuma punya 1 akun (bukan 1 akun per outlet), data tidak otomatis
+      terpisah per outlet.
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>ID Outlet (huruf kecil, tanpa spasi)</label>
+        <input type="text" id="outletId" placeholder="cth: bandung-01">
+      </div>
+      <div class="field">
+        <label>Nama Outlet</label>
+        <input type="text" id="outletName" placeholder="cth: ABBQ Bandung Setiabudi">
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="addOutlet()">+ Tambah Outlet</button>
+    <div class="table-wrap" style="margin-top:14px;">
+      <table>
+        <thead><tr><th>ID</th><th>Nama</th><th></th></tr></thead>
+        <tbody id="outletBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">💾 Backup &amp; Restore Data</div>
+    <div class="info-box">
+      Karena semua data mode offline ini tersimpan di browser perangkat ini saja, gunakan tombol ini
+      secara berkala untuk menyimpan cadangan (mis. sebelum ganti HP/laptop, atau sebelum hapus data
+      browser).
+    </div>
+    <button class="btn btn-secondary" onclick="exportBackup()">⬇️ Unduh Backup (.json)</button>
+    <div class="field" style="margin-top:14px;">
+      <label>Pulihkan dari File Backup</label>
+      <input type="file" id="restoreFile" accept="application/json">
+    </div>
+    <button class="btn btn-secondary" onclick="importBackup()">⬆️ Pulihkan dari Backup</button>
+    <div id="backupResult" style="font-size:13px;margin-top:8px;"></div>
+  </div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+<script src="../shared/ui-dialog.js?v=41"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>

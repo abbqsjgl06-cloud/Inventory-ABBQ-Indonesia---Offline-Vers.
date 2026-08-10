@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Master Data — Inventory ABBQ</title>
+<link rel="icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#4A4A4A; --accent-tint:#ECECEC; }
+  .tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;}
+  .tab-btn{
+    flex:none;padding:9px 16px;border-radius:999px;border:1px solid var(--line);
+    background:var(--card);font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);
+  }
+  .tab-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* Tabel di halaman ini (BOM/Resep Menu, Item Bahan Baku, Supplier
+     Barang) dibuat lebih ringkas + kolom nama tetap kelihatan saat
+     digeser, supaya tidak perlu geser jauh-jauh cuma untuk lihat nama
+     item/menu-nya. */
+  .table-wrap table{ min-width:0; }
+  .table-wrap th, .table-wrap td{
+    font-size:12px;
+    padding:6px 8px;
+  }
+  .table-wrap th:nth-child(2), .table-wrap td:nth-child(2){
+    position:-webkit-sticky;position:sticky;
+    left:0;
+    background:var(--card);
+    max-width:130px;
+    white-space:normal;
+    z-index:2;
+  }
+  .table-wrap th:nth-child(2){ background:var(--accent-tint); z-index:3; }
+</style>
+</head>
+<body>
+
+<div id="appContent" style="display:none;">
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">ABBQ Indonesia</div>
+    <div class="topbar-h1">Master Data</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel admin-only" id="panelOutletName">
+    <div class="panel-title">Nama Outlet</div>
+    <div class="field">
+      <input type="text" id="outletName" placeholder="Contoh: ABBQ Indonesia - Outlet Pusat">
+    </div>
+    <button class="btn btn-primary" onclick="saveOutletName()">Simpan Nama Outlet</button>
+  </div>
+
+  <div class="panel admin-only" id="panelBomUpload">
+    <div class="panel-title">📥 Update BOM dari File Excel</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+      Kalau ada resep/menu baru atau perubahan BOM, upload file Excel-nya di sini
+      (format 2 sheet: <b>Sales</b> &amp; <b>BOM</b>).
+    </p>
+    <label for="bomFileInput" style="display:block;border:2px dashed var(--line);border-radius:14px;padding:22px 16px;text-align:center;color:var(--muted);font-size:13px;margin-bottom:12px;cursor:pointer;">
+      📄 Ketuk untuk pilih file BOM.xlsx<br>
+      <span id="bomFileName" style="font-weight:600;color:var(--ink);"></span>
+    </label>
+    <input type="file" id="bomFileInput" accept=".xlsx,.xls" style="display:none;">
+
+    <div id="bomPreview" style="display:none;">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-label">Menu Terbaca</div>
+          <div class="summary-value" id="bomPrevMenus">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Baris BOM</div>
+          <div class="summary-value" id="bomPrevRows">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Item Baru</div>
+          <div class="summary-value pos" id="bomPrevNewItems">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Item Diperbarui</div>
+          <div class="summary-value" id="bomPrevUpdatedItems">0</div>
+        </div>
+      </div>
+      <div id="bomPrevDupWarning" style="display:none;background:#FFF3C4;color:#7A5A00;font-size:12px;padding:10px 12px;border-radius:8px;margin-bottom:12px;"></div>
+      <button class="btn btn-primary" onclick="confirmBomImport()">✓ Terapkan Update Ini</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Ringkasan Master Data</div>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">Item Bahan Baku</div>
+        <div class="summary-value" id="materialCount">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Menu</div>
+        <div class="summary-value" id="menuCount">0</div>
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="toggleDetail()" id="toggleDetailBtn">Lihat Detail Item &amp; BOM ▾</button>
+  </div>
+
+  <div id="detailSection" style="display:none;">
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="materials">Item Bahan Baku</button>
+      <button class="tab-btn" data-tab="bom">BOM / Resep Menu</button>
+      <button class="tab-btn admin-only" data-tab="supplier">Supplier Barang</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-materials">
+      <div class="panel">
+        <div class="panel-title">Cari Item</div>
+        <div class="field">
+          <input type="text" id="searchMaterial" placeholder="Cari kode atau nama item..." oninput="renderMaterials()">
+        </div>
+      </div>
+
+      <div class="panel admin-only" id="panelAddMaterial">
+        <div class="panel-title">Tambah / Edit Item Manual</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Kode Material</label>
+            <input type="text" id="matCode" placeholder="cth 120298">
+          </div>
+          <div class="field">
+            <label>UOM</label>
+            <input type="text" id="matUom" placeholder="cth G / PC / ML">
+          </div>
+        </div>
+        <div class="field">
+          <label>Nama Item</label>
+          <input type="text" id="matName" placeholder="Nama material">
+        </div>
+        <div class="field">
+          <label>Konversi (Konv) — info kemasan</label>
+          <input type="number" id="matKonv" placeholder="cth 900">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveMaterial()">Simpan Item</button>
+          <button class="btn btn-secondary" onclick="resetMaterialForm()">Bersihkan</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Kode</th><th>Nama Item</th><th>UOM</th><th class="num">Konv</th><th class="admin-only-cell"></th></tr>
+          </thead>
+          <tbody id="materialsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-bom">
+      <div class="panel admin-only" id="panelCleanupBom" style="border:2px solid #C23B2E;">
+        <div class="panel-title">🧹 Bersihkan Semua Duplikat BOM</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+          Cek SELURUH resep (semua menu sekaligus), cari bahan yang tercatat lebih dari 1x di
+          resep yang sama, lalu hapus otomatis sisa duplikatnya (baris pertama yang ditemukan
+          dipertahankan). Aman dijalankan berkali-kali - kalau tidak ada duplikat, tidak ada yang
+          berubah.
+        </p>
+        <button class="btn btn-secondary" style="border-color:#C23B2E;color:#C23B2E;" onclick="cleanupAllBomDuplicates()">🧹 Cek &amp; Bersihkan Sekarang</button>
+        <div id="cleanupBomResult" style="font-size:13px;margin-top:10px;white-space:pre-line;"></div>
+      </div>
+
+      <div class="panel admin-only" id="panelAddMenu">
+        <div class="panel-title">➕ Tambah Menu Baru</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+          Untuk menu yang benar-benar belum pernah ada. Setelah menu-nya dibuat, tambahkan resep
+          (bahan bakunya) lewat kartu menu yang muncul di bawah - pakai "+ Tambah Bahan" seperti
+          menu lain.
+        </p>
+        <div class="field">
+          <label>Kode Menu</label>
+          <input type="text" id="newMenuCode" placeholder="Kode menu (harus unik)">
+        </div>
+        <div class="field">
+          <label>Nama Menu</label>
+          <input type="text" id="newMenuName" placeholder="Nama menu">
+        </div>
+        <button class="btn btn-primary" onclick="addNewMenu()">+ Buat Menu</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Cari Menu</div>
+        <div class="field">
+          <input type="text" id="searchMenu" placeholder="Cari kode atau nama menu..." oninput="renderMenus()">
+        </div>
+      </div>
+      <div id="menuList"></div>
+    </div>
+
+    <div class="tab-panel" id="tab-supplier">
+      <div class="panel admin-only" id="panelSupplierUpload">
+        <div class="panel-title">📥 Upload Daftar Supplier per Item</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+          Tentukan setiap item bahan baku dipasok oleh supplier mana. Ini yang dipakai
+          Forecasting Ordering supaya waktu pilih supplier, cuma item punya supplier itu
+          saja yang muncul (tidak semua item bahan baku sekaligus).
+        </p>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+          Supplier yang valid: <b>CK Ingredients</b>, <b>CK Frozen</b>, <b>Frenindo</b>, <b>Vita</b>.
+        </p>
+        <button class="btn btn-secondary" onclick="downloadSupplierTemplate()" style="margin-bottom:12px;">⬇ Download Template (sudah terisi kode &amp; nama item)</button>
+
+        <label for="supplierFileInput" style="display:block;border:2px dashed var(--line);border-radius:14px;padding:22px 16px;text-align:center;color:var(--muted);font-size:13px;margin-bottom:12px;cursor:pointer;">
+          📄 Ketuk untuk pilih file Supplier.xlsx yang sudah diisi<br>
+          <span id="supplierFileName" style="font-weight:600;color:var(--ink);"></span>
+        </label>
+        <input type="file" id="supplierFileInput" accept=".xlsx,.xls" style="display:none;">
+
+        <div id="supplierPreview" style="display:none;">
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Baris Terbaca</div>
+              <div class="summary-value" id="supPrevRows">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Item Dipetakan</div>
+              <div class="summary-value pos" id="supPrevMapped">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Supplier Tidak Valid</div>
+              <div class="summary-value neg" id="supPrevInvalid">0</div>
+            </div>
+          </div>
+          <div id="supPrevInvalidList" style="display:none;font-size:12px;color:#8C2A1E;background:#FCEBE9;border-radius:8px;padding:10px 12px;margin-bottom:12px;"></div>
+          <button class="btn btn-primary" onclick="confirmSupplierImport()">✓ Terapkan Update Ini</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Cari Item</div>
+        <div class="field">
+          <input type="text" id="searchSupplierItem" placeholder="Cari kode atau nama item..." oninput="renderSupplierItems()">
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Kode</th><th>Nama Item</th><th>Supplier</th><th class="admin-only-cell"></th></tr>
+          </thead>
+          <tbody id="supplierItemsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel admin-only" id="panelResetSeed">
+      <div class="panel-title">Reset Data Master</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+        Menghapus seluruh item &amp; BOM lalu memuat ulang dari data awal (seed).
+        Data Goods Receipt, Transfer, dan lainnya tidak terpengaruh.
+      </p>
+      <button class="btn btn-ghost" onclick="resetSeed()">Reset ke Data Awal</button>
+    </div>
+
+  </div>
+
+</main>
+
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script src="../shared/xlsx.full.min.js?v=25"></script>
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+<script src="../shared/seed-data.js?v=25"></script>
+<script src="../shared/ui-dialog.js?v=41"></script>
+<script src="app.js?v=30"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>End of Day — Inventory ABBQ</title>
+<link rel="icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#7E1D8C; --accent-tint:#F3E7F6; }
+  thead th{background:var(--accent-tint);}
+
+  .checklist-item{
+    display:flex;align-items:flex-start;gap:12px;
+    padding:14px 4px;border-bottom:1px solid var(--line);
+  }
+  .checklist-item:last-child{border-bottom:none;}
+  .cl-icon{
+    width:28px;height:28px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;flex:none;margin-top:2px;
+  }
+  .cl-icon.ok{background:#E6F3EC;color:#1E5C36;}
+  .cl-icon.warn{background:#FCEBE9;color:#8C2A1E;}
+  .cl-icon.loading{background:var(--accent-tint);color:var(--muted);}
+  .cl-body{flex:1;}
+  .cl-title{font-weight:700;font-size:14px;}
+  .cl-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+  .cl-optional{
+    display:inline-block;font-size:10px;font-weight:700;color:var(--muted);
+    background:var(--paper);border:1px solid var(--line);border-radius:999px;
+    padding:2px 8px;margin-left:6px;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">ABBQ Indonesia</div>
+    <div class="topbar-h1">End of Day</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <div class="panel-title">Business Date Berjalan (Resmi)</div>
+    <div style="font-size:26px;font-weight:800;" id="bizDateDisplay">–</div>
+    <div id="adminDateEditBox" style="display:none;margin-top:14px;">
+      <div class="field">
+        <label>Pilih Tanggal yang Ingin Ditutup (Admin)</label>
+        <input type="date" id="targetDateInput">
+      </div>
+      <button class="btn btn-secondary" onclick="applyTargetDate()">Muat Checklist Tanggal Ini</button>
+      <p style="font-size:11px;color:var(--muted);margin-top:8px;">
+        Untuk mengejar tanggal yang terlewat: pilih tanggal lama di sini, checklist &amp;
+        pilihan sesi di bawah otomatis mengikuti tanggal tersebut.
+      </p>
+    </div>
+  </div>
+
+  <div class="panel" style="background:var(--accent-tint);border-color:var(--accent);">
+    <div class="panel-title">Sedang Meninjau / Akan Ditutup</div>
+    <div style="font-size:20px;font-weight:800;" id="targetDateDisplay">–</div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Checklist Sebelum Tutup Hari</div>
+    <div id="checklistBox">
+      <div class="checklist-item">
+        <div class="cl-icon loading">…</div>
+        <div class="cl-body"><div class="cl-title">Memuat status...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Pilih Sesi Stock Opname — Ending Hari Ini</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Pilih 1 atau lebih sesi (misalnya Kitchen + Frontliner) sebagai hasil stock opname akhir untuk tanggal yang sedang ditinjau di atas. Ini akan menjadi Opening Stock hari berikutnya.</p>
+    <div class="sess-list" id="endingList"></div>
+  </div>
+
+  <div class="panel" style="border:2px solid var(--accent);">
+    <div class="panel-title">🔒 Tutup Business Date Ini</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">
+      Setelah ditutup, business date otomatis maju ke hari berikutnya, dan Ending
+      Stock hari ini menjadi Opening Stock hari berikutnya di Laporan Variance.
+    </p>
+    <button class="btn btn-primary" onclick="closeToday()">🔒 Tutup Hari Ini &amp; Lanjut ke Hari Berikutnya</button>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Riwayat End of Day</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Pilih rentang tanggal untuk melihat riwayat (tidak ditampilkan otomatis supaya tidak terlalu panjang).</p>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal</label>
+        <input type="date" id="historyFilterStart">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal</label>
+        <input type="date" id="historyFilterEnd">
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="loadEodHistoryRange()" style="margin-bottom:14px;">Tampilkan Riwayat</button>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Business Date</th><th>Ditutup Pada</th><th class="num">Jumlah Item</th></tr></thead>
+        <tbody id="historyBody"><tr><td colspan="3" class="empty">Pilih tanggal lalu tekan "Tampilkan Riwayat"</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+<script src="../shared/seed-data.js?v=30"></script>
+<script src="../shared/ui-dialog.js?v=41"></script>
+<script src="app.js?v=30"></script>
+</body>
+</html>

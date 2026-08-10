@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<meta name="theme-color" content="#E8520A">
+<link rel="manifest" href="manifest.json">
+<title>Kalkulator BOM Appetizer ABBQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/tabler-icons.min.css">
+</head>
+<body>
+
+<a href="../index.html" style="position:fixed;top:14px;left:14px;z-index:999;background:rgba(0,0,0,.55);color:#fff;text-decoration:none;font-size:13px;font-weight:600;padding:7px 12px;border-radius:20px;">← Menu Utama</a>
+
+<style>
+:root{
+  --font-sans: "Inter", sans-serif;
+  --border-radius-lg: 14px;
+  --border-radius-md: 8px;
+  --color-background-primary: #FFFFFF;
+  --color-background-secondary: #FAF7F2;
+  --color-text-primary: #1C1B19;
+  --color-text-secondary: #79746B;
+  --color-text-tertiary: #A39D91;
+  --color-border-primary: #E7E2D9;
+  --color-border-secondary: #E7E2D9;
+  --color-border-tertiary: #EFEBE3;
+}
+body { background: var(--color-background-secondary); padding: 20px 14px 60px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.header { background: #E8520A; color: #fff; padding: 14px 20px; display: flex; align-items: center; gap: 10px; border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0; }
+.header i { font-size: 22px; }
+.header h1 { font-size: 17px; font-weight: 500; letter-spacing: 0.3px; }
+.subheader { font-size: 13px; color: var(--color-text-secondary); padding: 12px 20px 4px; }
+.product-list { padding: 0 16px 12px; display: flex; flex-direction: column; gap: 8px; }
+.product-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+.product-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; }
+.product-name { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+.product-unit { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+.qty-control { display: flex; align-items: center; gap: 0; }
+.qty-btn { width: 34px; height: 34px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); font-size: 18px; font-weight: 400; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.1s; user-select: none; }
+.qty-btn:first-child { border-radius: var(--border-radius-md) 0 0 var(--border-radius-md); }
+.qty-btn:last-child { border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; background: #FFF3EA; color: #E8520A; border-color: #E8C09A; }
+.qty-btn:last-child:hover { background: #FFE0C8; }
+.qty-btn:first-child:hover { background: var(--color-background-secondary); }
+.qty-display { width: 44px; height: 34px; border-top: 0.5px solid var(--color-border-secondary); border-bottom: 0.5px solid var(--color-border-secondary); border-left: none; border-right: none; text-align: center; font-size: 15px; font-weight: 500; background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+.materials-panel { border-top: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); padding: 10px 14px; display: none; }
+.materials-panel.open { display: block; }
+.mat-title { font-size: 12px; color: var(--color-text-secondary); font-weight: 500; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.mat-table { width: 100%; font-size: 13px; border-collapse: collapse; }
+.mat-table th { color: var(--color-text-secondary); font-weight: 500; text-align: left; padding: 3px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 11px; }
+.mat-table th:last-child, .mat-table td:last-child { text-align: right; }
+.mat-table td { padding: 4px 0; color: var(--color-text-primary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.mat-table tr:last-child td { border-bottom: none; }
+.mat-qty { font-weight: 500; color: #C04400; }
+.footer-note { font-size: 12px; color: var(--color-text-tertiary); text-align: center; padding: 8px 0 14px; }
+</style>
+
+<div style="border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; max-width: 680px;">
+  <div class="header">
+    <i class="ti ti-tools-kitchen-2" aria-hidden="true"></i>
+    <h1>Kalkulator BOM Resto — Appetizer</h1>
+  </div>
+  <p class="subheader">Tentukan jumlah produk yang dibuat:</p>
+  <div class="product-list" id="productList"></div>
+  <p class="footer-note">Inventory ABBQ &nbsp;·&nbsp; FDL © 2026 &nbsp;·&nbsp; Data: Konversi Waste/SO Appetizer</p>
+</div>
+
+<script>
+const products = [
+  {
+    id: 'sayur_asem',
+    name: 'Sayur Asem',
+    unit: 'Porsi',
+    materials: [
+      { name: 'Jagung Manis', konversi: 13.3, uom: 'G' },
+      { name: 'Nangka Muda', konversi: 13.3, uom: 'G' },
+      { name: 'Kacang Tanah dengan Kulit', konversi: 6.6, uom: 'G' },
+      { name: 'Kacang Panjang', konversi: 6.6, uom: 'G' },
+      { name: 'Pepaya Muda', konversi: 13.3, uom: 'G' },
+      { name: 'Daun Melinjo Muda', konversi: 4, uom: 'G' },
+      { name: 'Melinjo', konversi: 2.6, uom: 'G' },
+      { name: 'Daun Salam', konversi: 0.5, uom: 'G' },
+      { name: 'Asam Muda Fresh', konversi: 12, uom: 'G' },
+      { name: 'Lengkuas', konversi: 5, uom: 'G' },
+      { name: 'Sayur Asem Based 307gr/pac', konversi: 0.1, uom: 'PCK' },
+    ]
+  },
+  {
+    id: 'perkedel',
+    name: 'Perkedel',
+    unit: 'Pcs',
+    materials: [
+      { name: 'Perkedel 10 PCS/PAC', konversi: 1, uom: 'PCS' },
+      { name: 'Fresh Eggs', konversi: 1.97, uom: 'G' },
+      { name: 'Chicken Seasoning R', konversi: 0.028, uom: 'G' },
+      { name: 'Frying Oil', konversi: 5, uom: 'G' },
+    ]
+  },
+  {
+    id: 'pisang_goreng',
+    name: 'Pisang Goreng',
+    unit: 'Pcs',
+    materials: [
+      { name: 'Pisang Kepok', konversi: 21.5, uom: 'G' },
+      { name: 'Tepung Terigu 1kg', konversi: 4.25, uom: 'G' },
+      { name: 'Tepung Tapioka', konversi: 1.42, uom: 'G' },
+      { name: 'Granulated Sugar 1kg/pac', konversi: 0.85, uom: 'G' },
+      { name: 'Cheese Processed', konversi: 2.5, uom: 'G' },
+      { name: 'Frying Oil', konversi: 5, uom: 'G' },
+      { name: 'Chocolate Filling ID', konversi: 0.77, uom: 'G' },
+      { name: 'Milk UHT Full Cream GF', konversi: 0.48, uom: 'G' },
+    ]
+  },
+  {
+    id: 'corn_ribs',
+    name: 'Corn Ribs',
+    unit: 'Pcs',
+    materials: [
+      { name: 'Jagung Manis', konversi: 33.6, uom: 'G' },
+      { name: 'Corn Ribs 300gr/pac', konversi: 0.02, uom: 'PAC' },
+      { name: 'Dry Parsley', konversi: 0.1, uom: 'G' },
+    ]
+  },
+  {
+    id: 'risoles_smoke_beef',
+    name: 'Risoles Smoke Beef',
+    unit: 'Gulung',
+    materials: [
+      { name: 'Chicken Seasoning R', konversi: 0.22, uom: 'G' },
+      { name: 'Tepung Terigu 1kg', konversi: 10.33, uom: 'G' },
+      { name: 'Fresh Eggs', konversi: 3.9, uom: 'G' },
+      { name: 'UHT Milk', konversi: 20, uom: 'G' },
+      { name: 'Mayonnaise', konversi: 10, uom: 'G' },
+      { name: 'Cheese Mozarella 1kg/pac', konversi: 10, uom: 'G' },
+      { name: 'Smoke Meat 500gr/pac', konversi: 8, uom: 'G' },
+      { name: 'Fresh Eggs (kulit)', konversi: 13.33, uom: 'G' },
+      { name: 'Bread Crumbs', konversi: 6.67, uom: 'G' },
+      { name: 'Cabai Rawit Hijau', konversi: 2.67, uom: 'G' },
+      { name: 'Frying Oil', konversi: 5, uom: 'G' },
+    ]
+  },
+  {
+    id: 'beef_spring_roll',
+    name: 'Fried Beef Spring Roll',
+    unit: 'Pcs',
+    materials: [
+      { name: 'Spring Roll 350gr/pac', konversi: 0.1, uom: 'PAC' },
+      { name: 'Kertas Beras', konversi: 1, uom: 'PCS' },
+      { name: 'Sambal Bangkok', konversi: 6.25, uom: 'G' },
+      { name: 'Frying Oil', konversi: 5, uom: 'G' },
+    ]
+  },
+  {
+    id: 'singkong_goreng',
+    name: 'Singkong Goreng',
+    unit: 'Pack (250gr)',
+    materials: [
+      { name: 'Fresh Singkong', konversi: 175.21, uom: 'G' },
+      { name: 'Garam Dolpin', konversi: 4, uom: 'G' },
+      { name: 'Frying Oil', konversi: 30, uom: 'G' },
+      { name: 'Bawang Putih', konversi: 2.7, uom: 'G' },
+      { name: 'Extra Hot J Bottle 330ml', konversi: 20, uom: 'G' },
+    ]
+  },
+];
+
+const qtys = {};
+products.forEach(p => qtys[p.id] = 0);
+
+function fmt(val) {
+  if (val === 0) return '0';
+  if (val < 0.01) return val.toFixed(4);
+  if (val < 1) return val.toFixed(2);
+  if (Number.isInteger(val)) return val.toString();
+  return parseFloat(val.toFixed(2)).toString();
+}
+
+function render() {
+  const list = document.getElementById('productList');
+  list.innerHTML = '';
+  products.forEach(p => {
+    const qty = qtys[p.id];
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    const mats = p.materials.map(m => {
+      const aktual = qty * m.konversi;
+      return `<tr>
+        <td>${m.name}</td>
+        <td>${m.uom}</td>
+        <td class="mat-qty">${fmt(aktual)}</td>
+      </tr>`;
+    }).join('');
+    card.innerHTML = `
+      <div class="product-row">
+        <div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-unit">Satuan: ${p.unit}</div>
+        </div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty('${p.id}',-1)">−</button>
+          <input class="qty-display" type="number" min="0" value="${qty}" onchange="setQty('${p.id}', this.value)" />
+          <button class="qty-btn" onclick="changeQty('${p.id}',1)">+</button>
+        </div>
+      </div>
+      <div class="materials-panel ${qty > 0 ? 'open' : ''}" id="mat_${p.id}">
+        <div class="mat-title">Kebutuhan Material</div>
+        <table class="mat-table">
+          <thead><tr><th>Nama Material</th><th>UOM</th><th>Total</th></tr></thead>
+          <tbody>${mats}</tbody>
+        </table>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function changeQty(id, delta) {
+  qtys[id] = Math.max(0, qtys[id] + delta);
+  render();
+}
+
+function setQty(id, val) {
+  qtys[id] = Math.max(0, parseInt(val) || 0);
+  render();
+}
+
+render();
+</script>
+
+<button id="installBtn" style="display:none;position:fixed;bottom:20px;right:20px;padding:12px;">
+Install App
+</button>
+
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+<script src="app.js"></script>
+</body>
+</html>

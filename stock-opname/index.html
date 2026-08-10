@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
+
+    <title>ABBQ Stock Opname</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link
+        rel="stylesheet"
+        href="style.css?v=5">
+
+    <link
+        rel="manifest"
+        href="manifest.json">
+
+    <meta
+        name="theme-color"
+        content="#1C1B19">
+
+</head>
+
+<body>
+
+    <a href="../index.html" style="position:fixed;top:14px;left:14px;z-index:999;background:rgba(0,0,0,.35);color:#fff;text-decoration:none;font-size:13px;font-weight:600;padding:7px 12px;border-radius:20px;">← Menu Utama</a>
+
+    <!-- NOTIFIKASI -->
+    <div
+        id="notif"
+        class="notif">
+    </div>
+
+    <div class="container">
+
+        <!-- LOGO -->
+        <img
+            src="abbq_logo.png"
+            class="logo"
+            alt="ABBQ Logo">
+
+        <h1>STOCK OPNAME ABBQ</h1>
+
+        <!-- PIC -->
+        <div class="form-group">
+
+            <label>PIC</label>
+
+            <input
+                type="text"
+                id="operator"
+                placeholder="Masukkan Nama PIC">
+
+        </div>
+
+        <!-- KATEGORI -->
+        <div class="form-group">
+
+            <label>Kategori</label>
+
+            <select id="kategori">
+
+                <option value="">
+                    -- Pilih Kategori --
+                </option>
+
+                <option value="Kitchen">
+                    Kitchen
+                </option>
+
+                <option value="Frontliner">
+                    Frontliner
+                </option>
+
+            </select>
+
+        </div>
+
+        <!-- TYPE -->
+        <div class="form-group">
+
+            <label>Type</label>
+
+            <select id="type">
+
+                <option value="">
+                    -- Pilih Type --
+                </option>
+
+                <option value="Daily">
+                    Daily
+                </option>
+
+                <option value="WM">
+                    Weekly / Monthly
+                </option>
+
+            </select>
+
+        </div>
+
+        <!-- TANGGAL -->
+        <div class="form-group">
+
+            <label>Tanggal</label>
+
+            <input
+                type="date"
+                id="tanggal">
+
+        </div>
+
+        <!-- ADMIN UPLOAD (Kitchen maupun Frontliner) -->
+        <div id="adminUploadBox" style="display:none;background:#EFEBE3;border:2px dashed #C9C2B4;border-radius:10px;padding:14px;margin:16px 0;text-align:left;">
+            <b>📥 Upload Data Stock Opname (Admin)</b>
+            <p style="font-size:12px;color:#666;margin:6px 0 10px;">
+                Isi PIC, Kategori, Type, dan Tanggal di atas dulu, lalu upload file Excel
+                2 kolom: <b>Kode, Qty</b>. Berlaku untuk Kitchen maupun Frontliner —
+                sistem otomatis pakai daftar item sesuai Kategori + Type yang dipilih.
+                Cocok untuk 1 hari, 1 kategori, 1 type sekaligus.
+            </p>
+            <input type="file" id="adminStockUploadFile" accept=".xlsx,.xls,.csv">
+            <div id="adminStockUploadResult" style="font-size:13px;margin-top:8px;"></div>
+        </div>
+
+        <!-- ADMIN UPLOAD BACKLOG BANYAK TANGGAL SEKALIGUS -->
+        <div id="adminBulkRangeBox" style="display:none;background:#E8F5E9;border:2px dashed #2E7D4F;border-radius:10px;padding:14px;margin:16px 0;text-align:left;">
+            <b>📦 Upload Riwayat Banyak Tanggal Sekaligus (Admin)</b>
+            <p style="font-size:12px;color:#444;margin:6px 0 10px;">
+                Untuk mengejar backlog SO beberapa hari/minggu dalam <b>1 file saja</b>. Format kolom:
+                <b>Kode | Tanggal | Qty</b> (kolom B = tanggal posting SO, format YYYY-MM-DD atau tanggal Excel biasa).
+                Sistem otomatis:
+            </p>
+            <ul style="font-size:12px;color:#444;margin:0 0 10px 18px;padding:0;">
+                <li>Memisah item ke Kitchen / Frontliner sesuai kode itemnya masing-masing.</li>
+                <li>Menentukan <b>Type</b> per tanggal: <b>WM</b> untuk hari Minggu, H-1 akhir bulan, dan tanggal akhir bulan — selebihnya <b>Daily</b>.</li>
+                <li>Kalau untuk tanggal+kategori+type yang sama SUDAH ADA laporan tersimpan, akan <b>ditimpa</b> (bukan dobel).</li>
+            </ul>
+            <div class="form-group">
+                <label>PIC (berlaku untuk semua tanggal di file ini)</label>
+                <input type="text" id="bulkRangePic" placeholder="Masukkan Nama PIC">
+            </div>
+            <button type="button" onclick="downloadBulkRangeTemplate()" style="margin-bottom:10px;">⬇ Download Template</button>
+            <input type="file" id="adminBulkRangeFile" accept=".xlsx,.xls,.csv">
+            <div id="adminBulkRangeResult" style="font-size:13px;margin-top:8px;white-space:pre-line;"></div>
+        </div>
+
+        <br>
+
+        <!-- MULAI -->
+        <button onclick="mulaiInput()">
+
+            MULAI INPUT STOCK
+
+        </button>
+
+        <br><br>
+
+        <!-- HISTORY -->
+        <button
+            onclick="window.location.href='history.html'">
+
+            RIWAYAT STOCK OPNAME
+
+        </button>
+
+        <br><br>
+
+        <!-- INSTALL -->
+        <button
+            id="installBtn"
+            style="display:none;">
+
+            INSTALL APP
+
+        </button>
+
+    </div>
+
+    <div class="watermark">
+
+        Inventory ABBQ — Stock Opname · FDL © 2026
+
+    </div>
+
+    <script src="../shared/local-db.js?v=1"></script>
+    <script src="../shared/local-auth.js?v=1"></script>
+    <script>window.AUTH_GUARD_DEPTH = 1;</script>
+    <script src="../shared/auth-guard.js?v=46"></script>
+    <script src="libraries/xlsx.full.min.js"></script>
+    <script src="app.js?v=3"></script>
+
+</body>
+
+</html>

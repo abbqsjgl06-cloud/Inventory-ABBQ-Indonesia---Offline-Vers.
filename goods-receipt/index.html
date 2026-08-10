@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Barang Masuk — Inventory ABBQ</title>
+<link rel="icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#2E7D4F; --accent-tint:#E6F3EC; }
+  thead th{background:var(--accent-tint);}
+  .src-panel{padding-bottom:10px;}
+  .src-header, .date-header{
+    display:flex;align-items:center;gap:8px;
+    cursor:pointer;font-weight:700;padding:6px 0;
+  }
+  .date-header{
+    font-size:13px;font-weight:600;color:var(--muted);
+    padding:10px 4px;border-bottom:1px solid var(--line);
+  }
+  .date-group{margin-bottom:4px;}
+  .toggle-arrow{display:inline-block;width:14px;color:var(--accent);}
+
+  /* PERBAIKAN: sebelumnya table-layout:fixed dengan lebar dalam px
+     tapi lupa padding ikut menambah lebar asli (box-sizing default
+     browser = content-box) - total lebar kolom jadi melebihi layar,
+     kolom Item yang tidak dikasih lebar eksplisit akhirnya kebagian
+     lebar negatif/nyaris nol, jadi tiap HURUF turun baris sendiri.
+     Sekarang pakai table-layout:auto + box-sizing:border-box supaya
+     hitungannya aman, kolom Item dikasih lebar minimum wajar supaya
+     bisa wrap 2-3 baris dengan enak dibaca. */
+  .riwayat-table-wrap table{ table-layout:auto; }
+  .riwayat-table-wrap th, .riwayat-table-wrap td{
+    box-sizing:border-box;
+    padding:6px 5px;
+    font-size:11.5px;
+  }
+  .riwayat-table-wrap th:nth-child(1), .riwayat-table-wrap td:nth-child(1){ width:20px; padding-left:3px; padding-right:1px; }
+  .riwayat-table-wrap th:nth-child(2), .riwayat-table-wrap td:nth-child(2){ width:48px; }
+  .riwayat-table-wrap th:nth-child(3), .riwayat-table-wrap td:nth-child(3){ min-width:90px; }
+  .riwayat-table-wrap th:nth-child(4), .riwayat-table-wrap td:nth-child(4){ width:36px; }
+  .riwayat-table-wrap th:nth-child(5), .riwayat-table-wrap td:nth-child(5){ width:32px; }
+  .riwayat-table-wrap th:nth-child(6), .riwayat-table-wrap td:nth-child(6){ width:56px; }
+  .riwayat-table-wrap th:nth-child(7), .riwayat-table-wrap td:nth-child(7){ width:44px; }
+
+  .riwayat-table-wrap td:nth-child(7) .btn{
+    display:block; width:100%; margin-bottom:3px; padding:3px 4px !important;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">ABBQ Indonesia</div>
+    <div class="topbar-h1">Barang Masuk (In CK / Supplier)</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <div class="panel-title">Input Kedatangan Barang</div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Tanggal</label>
+        <input type="date" id="rcvDate">
+      </div>
+      <div class="field">
+        <label>Sumber</label>
+        <select id="rcvSource">
+          <option value="CK">In CK (Central Kitchen)</option>
+          <option value="Supplier">In Supplier</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Keterangan / No. PO (opsional, berlaku untuk semua item di bawah)</label>
+      <input type="text" id="rcvNote" placeholder="cth QX26050037">
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--line);margin:16px 0;">
+
+    <div class="panel" style="background:#EAF3FF;border:2px dashed #4A90D9;margin:0 0 16px;">
+      <div class="panel-title">📷 Scan PO dari Foto (Beta)</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+        Foto dokumen PO/DO, sistem akan coba baca Kode &amp; Nama Barang otomatis.
+        Kalau dokumen tidak punya kolom kode, sistem akan coba cocokkan dari
+        <b>nama/deskripsi barangnya</b> ke Master Data (mis. "KOL KUBIS PUTIH" bisa
+        kecocok ke item "KOL").
+        <b>Selalu cek ulang hasilnya</b> — foto pudar/tulisan tangan sering salah baca.
+        Qty tetap harus diisi manual karena biasanya tidak tercetak di dokumen.
+      </p>
+      <input id="ocrPhotoInput" type="file" accept="image/*" capture="environment" style="display:none;">
+      <input id="ocrPhotoInputGallery" type="file" accept="image/*" style="display:none;">
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button type="button" class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('ocrPhotoInput').click()">📷 Ambil Foto</button>
+        <button type="button" class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('ocrPhotoInputGallery').click()">🖼️ Dari Galeri</button>
+      </div>
+      <div id="ocrStatus" style="font-size:13px;font-weight:600;display:none;margin-bottom:10px;"></div>
+      <img id="ocrPreview" style="display:none;max-width:100%;border-radius:10px;margin-bottom:10px;">
+
+      <div id="ocrReviewWrap" style="display:none;">
+        <div class="table-wrap" style="margin-bottom:10px;">
+          <table>
+            <thead><tr><th>Kode</th><th>Nama Barang</th><th>UOM</th><th>Qty</th><th></th></tr></thead>
+            <tbody id="ocrReviewBody"></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" onclick="ocrAddManualRow()">+ Tambah Baris</button>
+          <button type="button" class="btn btn-primary" onclick="ocrAddAllToStaging()">✓ Tambahkan ke Daftar Item</button>
+        </div>
+      </div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--line);margin:16px 0;">
+
+    <div class="field" style="position:relative;">
+      <label>Item</label>
+      <input type="text" id="itemSearch" placeholder="Ketik kode atau nama item, atau ketuk untuk lihat semua..." autocomplete="off">
+      <div class="suggest-list" id="suggestList"></div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Qty</label>
+        <input type="number" id="rcvQty" min="0" step="any" placeholder="0">
+      </div>
+      <div class="field">
+        <label>UOM</label>
+        <input type="text" id="rcvUom" readonly>
+      </div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="addToStaging()">+ Tambah Item ke Daftar</button>
+  </div>
+
+  <div class="panel" id="stagingPanel" style="display:none;">
+    <div class="panel-title">Daftar Item (Belum Disimpan)</div>
+    <div class="table-wrap" style="margin-bottom:14px;">
+      <table>
+        <thead><tr><th>Kode</th><th>Item</th><th class="num">Qty</th><th>UOM</th><th></th></tr></thead>
+        <tbody id="stagingBody"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-primary" onclick="saveAllStaging()" id="saveStagingBtn">💾 Simpan Semua ke Riwayat</button>
+  </div>
+
+  <div class="panel" id="adminImportBox" style="display:none;background:#FFF7E0;border:2px dashed #f1c40f;">
+    <div class="panel-title">📥 Import Barang Masuk dari Excel (Admin)</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+      Kolom wajib: <b>Tanggal (YYYY-MM-DD), Sumber (CK/Supplier), Kode, Qty</b>, dan opsional <b>Keterangan/No PO</b>.
+      Kolom Item &amp; UOM boleh ada (diabaikan, hanya untuk referensi) — cocok untuk file hasil tombol Export di bawah.
+      Cocok untuk mengejar backlog barang masuk tanggal lama dengan cepat.
+    </p>
+    <input type="file" id="adminImportFile" accept=".xlsx,.xls,.csv">
+    <div id="adminImportResult" style="font-size:13px;margin-top:8px;"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Filter Riwayat</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal</label>
+        <input type="date" id="filterStart" onchange="renderHistory()">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal</label>
+        <input type="date" id="filterEnd" onchange="renderHistory()">
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-label">Total Baris</div>
+      <div class="summary-value" id="sumRows">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Item Berbeda</div>
+      <div class="summary-value" id="sumItems">0</div>
+    </div>
+  </div>
+
+  <div class="btn-row" style="margin-bottom:12px;">
+    <button class="btn btn-secondary" onclick="exportSelected()">⬇ Export Item Terpilih (<span id="selectedCount">0</span>)</button>
+    <button class="btn btn-ghost" id="deleteSelectedBtn" style="color:#C23B2E;border-color:#C23B2E;display:none;" onclick="deleteSelected()">🗑 Hapus Terpilih (<span id="selectedCountDel">0</span>)</button>
+  </div>
+
+  <div id="historyGroups"></div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+<script src="../shared/xlsx.full.min.js?v=31"></script>
+<script src="../shared/seed-data.js?v=31"></script>
+<script src="../shared/ui-dialog.js?v=41"></script>
+<script src="app.js?v=35"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="ocr-scan.js?v=45"></script>
+</body>
+</html>

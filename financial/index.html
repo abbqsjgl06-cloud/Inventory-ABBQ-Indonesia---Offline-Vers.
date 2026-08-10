@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Financial — Inventory ABBQ</title>
+<link rel="icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#0D7A5F; --accent-tint:#E2F5EF; }
+  .sub-card{
+    display:flex;align-items:center;gap:14px;background:var(--card);
+    border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;
+    text-decoration:none;color:inherit;transition:box-shadow .15s;
+  }
+  .sub-card:active{transform:scale(.99);}
+  .sub-icon{
+    width:46px;height:46px;border-radius:12px;background:var(--accent-tint);
+    display:flex;align-items:center;justify-content:center;font-size:22px;flex:none;
+  }
+  .sub-title{font-weight:700;font-size:15px;margin-bottom:2px;color:#0D5A46;}
+  .sub-desc{font-size:12px;color:var(--muted);}
+  .sub-chevron{margin-left:auto;color:var(--muted);font-size:20px;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">ABBQ Indonesia</div>
+    <div class="topbar-h1">Financial</div>
+  </div>
+</header>
+
+<main>
+
+  <a class="sub-card" href="cash-handover/index.html">
+    <div class="sub-icon">💵</div>
+    <div>
+      <div class="sub-title">Cash Handover</div>
+      <div class="sub-desc">Handover Casheet (Opening/Closing) &amp; Handover Petty Cash</div>
+    </div>
+    <div class="sub-chevron">›</div>
+  </a>
+
+  <a class="sub-card" href="remittance/index.html">
+    <div class="sub-icon">🏦</div>
+    <div>
+      <div class="sub-title">Remittance of Fund</div>
+      <div class="sub-desc">Sales Cash, Petty Cash, Cashless &amp; total setoran bank</div>
+    </div>
+    <div class="sub-chevron">›</div>
+  </a>
+
+  <a class="sub-card" href="petty-cash/index.html">
+    <div class="sub-icon">🧾</div>
+    <div>
+      <div class="sub-title">Tracking Petty Cash</div>
+      <div class="sub-desc">Catat penggunaan petty cash + foto struk/barang, saldo otomatis</div>
+    </div>
+    <div class="sub-chevron">›</div>
+  </a>
+
+</main>
+
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+</body>
+</html>

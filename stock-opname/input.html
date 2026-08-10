@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
+
+    <title>Input Stock Opname ABBQ</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link
+        rel="stylesheet"
+        href="style.css?v=5">
+
+</head>
+
+<body>
+
+    <!-- NOTIFIKASI -->
+    <div
+        id="notif"
+        class="notif">
+    </div>
+
+    <div class="container">
+
+        <h2 id="judulHalaman">
+
+            LOADING...
+
+        </h2>
+
+        <div id="adminUploadBox" style="display:none;background:#EFEBE3;border:2px dashed #C9C2B4;border-radius:10px;padding:14px;margin:15px 0;">
+            <b>📥 Upload Qty dari Excel (Admin)</b>
+            <p style="font-size:12px;color:#666;margin:6px 0 10px;">File Excel 2 kolom: <b>Kode</b>, <b>Qty</b>. Cocok untuk mengejar backlog input tanggal lama.</p>
+            <input type="file" id="adminUploadFile" accept=".xlsx,.xls,.csv">
+            <div id="adminUploadResult" style="font-size:13px;margin-top:8px;"></div>
+        </div>
+
+        <div id="adminManageBox" style="display:none;background:#EFEBE3;border:2px dashed #C9C2B4;border-radius:10px;padding:14px;margin:15px 0;">
+            <button type="button" onclick="toggleAdminManage()" style="width:100%;background:#1C1B19;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;">
+                🛠 Kelola Daftar Item (Admin) <span id="adminManageArrow">▾</span>
+            </button>
+            <div id="adminManagePanel" style="display:none;margin-top:12px;">
+                <p style="font-size:12px;color:#666;margin-bottom:10px;">
+                    Perubahan di sini berlaku untuk daftar item <b id="adminManageListLabel">-</b> dan langsung
+                    tersimpan ke server — tidak perlu update aplikasi.
+                </p>
+
+                <div style="background:#fff;border:1px solid #eee;border-radius:8px;padding:10px;margin-bottom:12px;">
+                    <b style="font-size:13px;">Tambah Item Baru</b>
+                    <div style="display:flex;gap:8px;margin-top:8px;">
+                        <input type="text" id="newItemKode" placeholder="Kode" style="flex:1;padding:8px;">
+                        <input type="text" id="newItemUom" placeholder="UOM" style="width:70px;padding:8px;">
+                    </div>
+                    <input type="text" id="newItemNama" placeholder="Nama Item" style="width:100%;padding:8px;margin-top:8px;">
+                    <input type="number" id="newItemKonv" placeholder="Konv" style="width:100%;padding:8px;margin-top:8px;">
+                    <button type="button" onclick="addAdminItem()" style="width:100%;margin-top:8px;background:#2E7D4F;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;">+ Tambah Item</button>
+                </div>
+
+                <div id="adminItemListBox" style="max-height:320px;overflow-y:auto;"></div>
+            </div>
+        </div>
+
+        <div style="position:relative;margin:15px 0;">
+            <input type="text" id="searchItem" placeholder="🔍 Cari item atau kode..." oninput="renderTable()" style="width:100%;padding:12px 40px 12px 12px;font-size:16px;border:2px solid #E7E2D9;border-radius:8px;box-sizing:border-box;">
+            <button type="button" onclick="document.getElementById('searchItem').value='';renderTable();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;min-width:32px;left:auto;background:none;border:none;font-size:18px;line-height:1;color:#888;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">✕</button>
+        </div>
+
+        <button type="button" id="jumpToAdminManage" onclick="jumpToAdminManage()" style="display:none;width:100%;background:#1C1B19;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;margin-bottom:12px;">
+            🛠 Tambah / Hapus Item (Admin)
+        </button>
+
+        <div class="table-scroll-wrap">
+        <table class="table-stock">
+
+            <thead>
+
+                <tr>
+
+                    <th>No</th>
+
+                    <th style="cursor:pointer;" onclick="sortTable('kode')">Kode <span id="sortArrowKode"></span></th>
+
+                    <th style="cursor:pointer;" onclick="sortTable('item')">Item <span id="sortArrowItem"></span></th>
+
+                    <th>Konv</th>
+
+                    <th>UOM</th>
+
+                    <th>PCS/Gr</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="tableBody">
+
+            </tbody>
+
+        </table>
+        </div>
+
+        <br>
+
+        <div class="panel" style="border:2px solid #2E7D4F;border-radius:12px;padding:15px;margin-bottom:10px;">
+            <h3 style="margin-top:0;color:#2E7D4F;">🍳 Product Preparation</h3>
+            <p style="font-size:12px;color:#666;">
+                Input jumlah <b>porsi</b> produk yang sudah di-prepare (bukan bahan mentah). Sistem otomatis
+                menghitung kebutuhan bahan baku dari resep (BOM) dan menambahkannya ke laporan stock opname ini
+                begitu ditekan <b>SIMPAN</b> di bawah.
+            </p>
+            <div class="table-scroll-wrap">
+                <table class="table-prep">
+                    <thead>
+                        <tr>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Qty Porsi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prepTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <button onclick="simpanData()">
+
+            SIMPAN
+
+        </button>
+
+        <br><br>
+
+        <button onclick="resetData()">
+
+            RESET
+
+        </button>
+
+        <br><br>
+
+        <button onclick="exportExcel()">
+
+            EXPORT EXCEL
+
+        </button>
+
+        <br><br>
+
+        <button
+            onclick="window.location.href='history.html'">
+
+            RIWAYAT
+
+        </button>
+
+        <br><br>
+
+        <button
+            onclick="window.location.href='index.html'">
+
+            MENU UTAMA
+
+        </button>
+
+    </div>
+
+    <div class="watermark">
+
+        © 2026 Fdl
+
+    </div>
+
+    <!-- FIREBASE -->
+    <script src="../shared/local-db.js?v=1"></script>
+    <script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+    <script src="../shared/ui-dialog.js?v=41"></script>
+
+    <!-- XLSX -->
+    <script src="libraries/xlsx.full.min.js"></script>
+
+    <!-- EXPORT -->
+    <script src="export.js"></script>
+
+    <!-- INPUT -->
+    <script src="calc-widget.js?v=2"></script>
+    <script src="input.js?v=5"></script>
+
+</body>
+
+</html>

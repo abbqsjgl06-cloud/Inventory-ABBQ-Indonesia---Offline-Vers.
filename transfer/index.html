@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Transfer Stock — Inventory ABBQ</title>
+<link rel="icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#6B4FBB; --accent-tint:#EFEAFB; }
+  thead th{background:var(--accent-tint);}
+  .seg{display:flex;gap:8px;margin-bottom:14px;}
+  .seg button{
+    flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card);font-weight:700;font-size:13px;cursor:pointer;color:var(--muted);
+  }
+  .seg button.active.out{background:#C23B2E;color:#fff;border-color:#C23B2E;}
+  .seg button.active.in{background:#2E7D4F;color:#fff;border-color:#2E7D4F;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">ABBQ Indonesia</div>
+    <div class="topbar-h1">Transfer Stock</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <div class="panel-title">Input Transfer</div>
+
+    <div class="seg">
+      <button type="button" class="active in" id="btnIn" onclick="setType('IN')">Transfer In</button>
+      <button type="button" class="out" id="btnOut" onclick="setType('OUT')">Transfer Out</button>
+    </div>
+
+    <div class="field">
+      <label>Tanggal</label>
+      <input type="date" id="trDate">
+    </div>
+
+    <div class="field">
+      <label id="outletLabel">Outlet Asal (Transfer In dari...)</label>
+      <input type="text" id="trOutlet" placeholder="Nama outlet/store">
+    </div>
+
+    <div class="field">
+      <label>Keterangan (opsional, berlaku untuk semua item di bawah)</label>
+      <input type="text" id="trNote" placeholder="Catatan tambahan">
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--line);margin:16px 0;">
+
+    <div class="field" style="position:relative;">
+      <label>Item</label>
+      <input type="text" id="itemSearch" placeholder="Ketik kode atau nama item, atau ketuk untuk lihat semua..." autocomplete="off">
+      <div class="suggest-list" id="suggestList"></div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Qty</label>
+        <input type="number" id="trQty" min="0" step="any" placeholder="0">
+      </div>
+      <div class="field">
+        <label>UOM</label>
+        <input type="text" id="trUom" readonly>
+      </div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="addToStaging()">+ Tambah Item ke Daftar</button>
+  </div>
+
+  <div class="panel" id="stagingPanel" style="display:none;">
+    <div class="panel-title">Daftar Item (Belum Disimpan)</div>
+    <div class="table-wrap" style="margin-bottom:14px;">
+      <table>
+        <thead><tr><th>Kode</th><th>Item</th><th class="num">Qty</th><th>UOM</th><th></th></tr></thead>
+        <tbody id="stagingBody"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-primary" onclick="saveAllStaging()" id="saveStagingBtn">💾 Simpan Semua ke Riwayat</button>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Filter Riwayat</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal</label>
+        <input type="date" id="filterStart" onchange="renderHistory()">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal</label>
+        <input type="date" id="filterEnd" onchange="renderHistory()">
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-label">Transfer In</div>
+      <div class="summary-value pos" id="sumIn">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Transfer Out</div>
+      <div class="summary-value neg" id="sumOut">0</div>
+    </div>
+  </div>
+
+  <div class="btn-row" style="margin-bottom:12px;">
+    <button class="btn btn-secondary" onclick="exportSelected()">⬇ Export Item Terpilih (<span id="selectedCount">0</span>)</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:36px;"><input type="checkbox" id="checkAll" onchange="toggleCheckAll(this)"></th>
+          <th>Tanggal</th><th>Tipe</th><th>Outlet</th><th>Kode</th><th>Item</th><th class="num">Qty</th><th>UOM</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+<script src="../shared/xlsx.full.min.js?v=40"></script>
+<script src="../shared/seed-data.js?v=40"></script>
+<script src="../shared/ui-dialog.js?v=41"></script>
+<script src="app.js?v=40"></script>
+</body>
+</html>

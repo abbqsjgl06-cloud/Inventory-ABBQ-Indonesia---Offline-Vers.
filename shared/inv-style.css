@@ -1,0 +1,358 @@
+/* ==========================================
+   ABBQ Inventory — Shared Design System
+   Used by: master-data, goods-receipt, transfer,
+   usage-import, variance-report
+========================================== */
+
+:root{
+  --ink:#1C1B19;
+  --paper:#FAF7F2;
+  --card:#FFFFFF;
+  --line:#E7E2D9;
+  --muted:#79746B;
+
+  --accent:#1C1B19;
+  --accent-tint:#EFEBE3;
+  --accent-deep:#1C1B19;
+
+  --good:#2E7D4F;
+  --bad:#C23B2E;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+
+body{
+  font-family:"Inter",-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+  padding-bottom:40px;
+}
+
+a{color:inherit;}
+
+/* ---------- Topbar ---------- */
+
+.topbar{
+  padding:calc(14px + env(safe-area-inset-top, 0px)) 20px 12px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border-bottom:1px solid var(--line);
+  background:var(--card);
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:10;
+}
+
+.back-btn{
+  width:36px;height:36px;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--paper);
+  border:1px solid var(--line);
+  text-decoration:none;
+  color:var(--ink);
+  font-size:18px;
+  flex:none;
+}
+
+.topbar-title{flex:1;min-width:0;}
+
+.topbar-eyebrow{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.topbar-h1{
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:-0.01em;
+}
+
+main{
+  width:100%;
+  max-width:640px;
+  margin:0 auto;
+  padding:calc(78px + env(safe-area-inset-top, 0px)) 18px 20px;
+}
+
+/* ---------- Cards ---------- */
+
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 1px 2px rgba(28,27,25,.04);
+}
+
+.panel-title{
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:14px;
+}
+
+/* ---------- Forms ---------- */
+
+.field{margin-bottom:14px;}
+
+.field label{
+  display:block;
+  font-size:12px;
+  font-weight:600;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  padding:11px 12px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--paper);
+  font-size:15px;
+  font-family:inherit;
+  color:var(--ink);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  outline:2px solid var(--accent);
+  outline-offset:1px;
+}
+
+.field-row{
+  display:flex;
+  gap:10px;
+}
+.field-row .field{flex:1;}
+
+/* ---------- Buttons ---------- */
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:13px 18px;
+  border-radius:12px;
+  border:none;
+  font-size:15px;
+  font-weight:700;
+  font-family:inherit;
+  cursor:pointer;
+  text-decoration:none;
+  width:100%;
+}
+
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+}
+
+.btn-secondary{
+  background:var(--card);
+  color:var(--ink);
+  border:1px solid var(--line);
+}
+
+.btn-ghost{
+  background:transparent;
+  color:var(--muted);
+  border:1px dashed var(--line);
+}
+
+.btn-row{
+  display:flex;
+  gap:10px;
+}
+.btn-row .btn{width:auto;flex:1;}
+
+.btn:active{transform:scale(.98);}
+
+/* ---------- Tables ---------- */
+
+.table-wrap{
+  overflow-x:auto;
+  border-radius:12px;
+  border:1px solid var(--line);
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+
+  /* Sebelumnya min-width:520px - itu yang bikin banyak tabel (Petty
+     Cash, Barang Masuk, Cash Handover, dll) selalu lebih lebar dari
+     layar HP dan harus digeser. Dihapus supaya tabel menyusut mengikuti
+     isi & muat penuh di layar sempit; kalau memang kolomnya banyak
+     (mis. laporan lintas outlet), .table-wrap masih overflow-x:auto
+     sebagai jaring pengaman. */
+  min-width:0;
+  table-layout:auto;
+}
+
+thead th, tbody td{
+  /* Supaya width:Npx yang dipasang modul-modul tertentu (mis. Petty
+     Cash, Barang Masuk) benar-benar berarti "lebar total termasuk
+     padding" - bukan "lebar konten, padding nambah di luar" (default
+     browser). Kalau lupa ini, kolom teks panjang bisa kebagian lebar
+     negatif dan tiap huruf turun baris sendiri-sendiri. */
+  box-sizing:border-box;
+}
+
+thead th{
+  background:var(--accent-tint);
+  color:var(--ink);
+  text-align:left;
+  padding:8px 8px;
+  font-weight:700;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+
+  /* Sebelumnya nowrap - dibiarkan boleh 2 baris supaya kolom tidak
+     memaksa tabel melebar keluar layar. */
+  white-space:normal;
+  overflow-wrap:break-word;
+}
+
+tbody td{
+  padding:8px 8px;
+  border-top:1px solid var(--line);
+
+  white-space:normal;
+  overflow-wrap:break-word;
+}
+
+tbody tr:hover{background:var(--paper);}
+
+.num{text-align:right;font-variant-numeric:tabular-nums;}
+.pos{color:var(--good);font-weight:700;}
+.neg{color:var(--bad);font-weight:700;}
+
+/* ---------- Chips / badges ---------- */
+
+.chip{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  background:var(--accent-tint);
+  color:var(--ink);
+}
+
+/* ---------- Notif ---------- */
+
+.notif{
+  display:none;
+  position:fixed;
+  left:50%;
+  bottom:24px;
+  transform:translateX(-50%);
+  padding:12px 20px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:600;
+  z-index:100;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
+.notif.success{background:#EAF6EE;color:#1E5C36;border:1px solid #BFE4CB;}
+.notif.error{background:#FCEBE9;color:#8C2A1E;border:1px solid #F3C5BE;}
+
+/* ---------- Empty state ---------- */
+
+.empty{
+  text-align:center;
+  padding:40px 20px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* ---------- Session picker list (checkbox + label rows) ---------- */
+
+.sess-list{
+  max-height:240px;overflow-y:auto;
+  border:1px solid var(--line);border-radius:12px;
+}
+.sess-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px;
+}
+.sess-item:last-child{border-bottom:none;}
+.sess-item input{width:auto;flex:none;}
+.sess-meta{flex:1;}
+.sess-meta b{display:block;font-size:13px;}
+.sess-meta small{color:var(--muted);}
+
+.suggest-list{
+  position:absolute;
+  left:0;
+  right:0;
+  top:100%;
+  border:1px solid var(--line);
+  border-radius:10px;
+  margin-top:6px;
+  max-height:240px;
+  overflow-y:auto;
+  background:var(--card);
+  box-shadow:0 10px 30px rgba(28,27,25,.12);
+  z-index:50;
+  display:none;
+}
+.suggest-item{
+  padding:10px 12px;
+  font-size:14px;
+  border-bottom:1px solid var(--line);
+  cursor:pointer;
+}
+.suggest-item:last-child{border-bottom:none;}
+.suggest-item:hover, .suggest-item.active{background:var(--accent-tint);}
+.suggest-item small{display:block;color:var(--muted);font-size:11px;margin-top:2px;}
+
+/* ---------- Summary cards ---------- */
+
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-bottom:16px;
+}
+.summary-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+}
+.summary-label{
+  font-size:11px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+.summary-value{
+  font-size:20px;
+  font-weight:800;
+}
+
+@media (max-width:420px){
+  .summary-grid{grid-template-columns:1fr 1fr;}
+}

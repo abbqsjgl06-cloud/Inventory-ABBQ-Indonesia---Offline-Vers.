@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Inventory ABBQ Indonesia</title>
+<meta name="theme-color" content="#1C1B19">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1C1B19;
+    --paper:#FAF7F2;
+    --card:#FFFFFF;
+    --line:#E7E2D9;
+    --muted:#79746B;
+
+    --waste:#F2B400;
+    --waste-tint:#FFF6DE;
+    --stock:#2464C7;
+    --stock-tint:#E9F0FC;
+    --bom:#E8520A;
+    --bom-tint:#FDECE3;
+
+    --receipt:#2E7D4F;
+    --receipt-tint:#E6F3EC;
+    --transfer:#6B4FBB;
+    --transfer-tint:#EFEAFB;
+    --usage:#0E8C8C;
+    --usage-tint:#E1F2F2;
+
+    --forecast:#1A5FB4;
+    --forecast-tint:#E3ECFB;
+    --variance:#B0281C;
+    --variance-tint:#FBE7E4;
+    --rekap-tint:#EFE9FB;
+    --master:#4A4A4A;
+    --master-tint:#ECECEC;
+    --eod:#7E1D8C;
+    --eod-tint:#F3E7F6;
+
+    --financial:#0D7A5F;
+    --financial-tint:#E2F5EF;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html,body{height:100%;}
+
+  body{
+    font-family:"Inter",sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+
+  .topbar{
+    padding:36px 24px 20px;
+    text-align:center;
+    position:relative;
+  }
+
+  .biz-date-badge{
+    position:absolute;
+    top:16px;
+    right:16px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 14px;
+    text-decoration:none;
+    color:var(--ink);
+    text-align:left;
+    box-shadow:0 1px 2px rgba(28,27,25,.04);
+  }
+  .biz-date-badge .bd-label{
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:block;
+  }
+  .biz-date-badge .bd-value{
+    font-size:13px;
+    font-weight:800;
+  }
+  @media (max-width:480px){
+    .biz-date-badge{ position:static; display:inline-flex; align-items:center; gap:6px; margin-bottom:12px; }
+    .biz-date-badge .bd-label{ display:inline; }
+    .biz-date-badge .bd-value{ font-size:12px; }
+  }
+
+  .logo{
+    width:64px;
+    height:64px;
+    object-fit:contain;
+    border-radius:16px;
+    margin-bottom:14px;
+  }
+
+  .eyebrow{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+
+  h1{
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+  }
+
+  .tagline{
+    margin-top:6px;
+    font-size:14px;
+    color:var(--muted);
+  }
+
+  main{
+    flex:1;
+    width:100%;
+    max-width:520px;
+    margin:0 auto;
+    padding:12px 20px 20px;
+  }
+
+  .section-label{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:22px 4px 10px;
+  }
+
+  .menu{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .menu-card{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:18px;
+    text-decoration:none;
+    color:var(--ink);
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    box-shadow:0 1px 2px rgba(28,27,25,.04);
+  }
+
+  .menu-card:active{
+    transform:scale(.98);
+  }
+
+  .menu-card:hover{
+    box-shadow:0 8px 20px rgba(28,27,25,.08);
+    border-color:transparent;
+  }
+
+  .icon-wrap{
+    flex:none;
+    width:52px;
+    height:52px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+  }
+
+  .icon-waste{background:var(--waste-tint);}
+  .icon-stock{background:var(--stock-tint);}
+  .icon-bom{background:var(--bom-tint);}
+  .icon-receipt{background:var(--receipt-tint);}
+  .icon-transfer{background:var(--transfer-tint);}
+  .icon-usage{background:var(--usage-tint);}
+  .icon-forecast{background:var(--forecast-tint);}
+  .icon-variance{background:var(--variance-tint);}
+  .icon-rekap{background:var(--rekap-tint);}
+  .icon-master{background:var(--master-tint);}
+  .icon-eod{background:var(--eod-tint);}
+  .icon-financial{background:var(--financial-tint);}
+
+  .card-body{flex:1;min-width:0;}
+
+  .card-title{
+    font-size:16px;
+    font-weight:700;
+    margin-bottom:2px;
+  }
+
+  .card-desc{
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.4;
+  }
+
+  .chevron{
+    flex:none;
+    color:var(--line);
+    font-size:20px;
+    font-weight:700;
+  }
+
+  .menu-card:hover .chevron{color:var(--muted);}
+
+  .accent-waste .card-title{color:#8A5A00;}
+  .accent-stock .card-title{color:#123E80;}
+  .accent-bom .card-title{color:#9E3A08;}
+  .accent-receipt .card-title{color:#1E5C36;}
+  .accent-transfer .card-title{color:#4A3785;}
+  .accent-usage .card-title{color:#0A5E5E;}
+  .accent-forecast .card-title{color:#12417D;}
+  .accent-variance .card-title{color:#7E1D14;}
+  .accent-rekap .card-title{color:#4E2F8C;}
+  .accent-master .card-title{color:#2E2E2E;}
+  .accent-eod .card-title{color:#5A1465;}
+  .accent-financial .card-title{color:#0D5A46;}
+
+  footer{
+    text-align:center;
+    padding:26px 20px 34px;
+    font-size:12px;
+    color:var(--muted);
+  }
+
+  footer .brand{
+    font-weight:700;
+    color:var(--ink);
+    letter-spacing:.02em;
+  }
+
+  footer .code{
+    display:inline-block;
+    margin-top:4px;
+    font-size:11px;
+    letter-spacing:.08em;
+    color:var(--muted);
+  }
+
+  /* ---------- Category-first home screen ---------- */
+  .cat-grid{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .cat-card{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:20px;
+    text-align:left;
+    width:100%;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+    box-shadow:0 1px 2px rgba(28,27,25,.04);
+  }
+  .cat-card:active{ transform:scale(.98); }
+  .cat-card:hover{ box-shadow:0 8px 20px rgba(28,27,25,.08); }
+  .cat-icon{
+    flex:none;
+    width:52px;
+    height:52px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+  }
+  .cat-body{ flex:1; min-width:0; }
+  .cat-title{ font-size:17px; font-weight:800; margin-bottom:2px; }
+  .cat-desc{ font-size:13px; color:var(--muted); }
+  .cat-chevron{ flex:none; color:var(--line); font-size:20px; font-weight:700; }
+
+  .back-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:2px 4px 18px;
+  }
+  .back-btn-inline{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 16px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .back-btn-inline:active{ transform:scale(.97); }
+
+  .category-section{ display:none; }
+  .category-section.active{ display:block; }
+  #categoryHome.hidden{ display:none; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="biz-date-badge" href="variance-report/index.html" title="Kelola business date di Laporan Variance">
+    <span class="bd-label">Business Date</span>
+    <span class="bd-value" id="bizDateValue">–</span>
+  </a>
+  <button onclick="authGuardLogout()" title="Logout" style="position:absolute;top:16px;left:16px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;">⎋ Logout</button>
+  <img src="logo.png" class="logo" alt="ABBQ Logo">
+  <div class="eyebrow">ABBQ Indonesia</div>
+  <h1>Inventory ABBQ Indonesia</h1>
+  <p class="tagline">Pilih menu yang ingin dikerjakan</p>
+</header>
+
+<main>
+
+  <div class="cat-grid" id="categoryHome">
+
+    <button class="cat-card" onclick="showCategory('harian')">
+      <div class="cat-icon" style="background:var(--stock-tint);">📋</div>
+      <div class="cat-body">
+        <div class="cat-title">Input Harian</div>
+        <div class="cat-desc">Stock Opname, Waste Tracker, Barang Masuk, Transfer, Financial</div>
+      </div>
+      <div class="cat-chevron">›</div>
+    </button>
+
+    <button class="cat-card" onclick="showCategory('laporan')">
+      <div class="cat-icon" style="background:var(--forecast-tint);">📊</div>
+      <div class="cat-body">
+        <div class="cat-title">Laporan &amp; Analisa</div>
+        <div class="cat-desc">Import Usage, Forecasting Ordering, Variance, Rekap Detail, BOM</div>
+      </div>
+      <div class="cat-chevron">›</div>
+    </button>
+
+    <button class="cat-card" onclick="showCategory('tutup')">
+      <div class="cat-icon" style="background:var(--eod-tint);">🔒</div>
+      <div class="cat-body">
+        <div class="cat-title">End of Day</div>
+        <div class="cat-desc">Checklist End of Day</div>
+      </div>
+      <div class="cat-chevron">›</div>
+    </button>
+
+    <button class="cat-card" onclick="showCategory('pengaturan')">
+      <div class="cat-icon" style="background:var(--master-tint);">🗂️</div>
+      <div class="cat-body">
+        <div class="cat-title">Pengaturan</div>
+        <div class="cat-desc">Master Data, Kelola Akun</div>
+      </div>
+      <div class="cat-chevron">›</div>
+    </button>
+
+  </div>
+
+  <div class="category-section" id="cat-harian">
+    <div class="back-row">
+      <button class="back-btn-inline" onclick="backToCategories()">← Menu</button>
+    </div>
+    <div class="section-label">Input Harian</div>
+    <nav class="menu">
+
+      <a class="menu-card accent-stock" href="stock-opname/index.html">
+        <div class="icon-wrap icon-stock">📋</div>
+        <div class="card-body">
+          <div class="card-title">Stock Opname</div>
+          <div class="card-desc">Input stok Kitchen &amp; Frontliner, Daily maupun WM.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+      <a class="menu-card accent-waste" href="waste-tracker/index.html">
+        <div class="icon-wrap icon-waste">🗑️</div>
+        <div class="card-body">
+          <div class="card-title">Waste Tracker</div>
+          <div class="card-desc">Catat &amp; pantau waste harian, foto bukti, dan riwayat.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+      <a class="menu-card accent-receipt" href="goods-receipt/index.html">
+        <div class="icon-wrap icon-receipt">📦</div>
+        <div class="card-body">
+          <div class="card-title">Barang Masuk</div>
+          <div class="card-desc">Input kedatangan barang dari Central Kitchen atau Supplier.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+      <a class="menu-card accent-transfer" href="transfer/index.html">
+        <div class="icon-wrap icon-transfer">🔄</div>
+        <div class="card-body">
+          <div class="card-title">Transfer Stock</div>
+          <div class="card-desc">Catat Transfer In &amp; Transfer Out antar outlet.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+      <a class="menu-card accent-financial" href="financial/index.html">
+        <div class="icon-wrap icon-financial">💰</div>
+        <div class="card-body">
+          <div class="card-title">Financial</div>
+          <div class="card-desc">Cash Handover &amp; Remittance of Fund harian.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+    </nav>
+  </div>
+
+  <div class="category-section" id="cat-tutup">
+    <div class="back-row">
+      <button class="back-btn-inline" onclick="backToCategories()">← Menu</button>
+    </div>
+    <div class="section-label">End of Day</div>
+    <nav class="menu">
+
+      <a class="menu-card accent-eod" href="end-of-day/index.html">
+        <div class="icon-wrap icon-eod">🔒</div>
+        <div class="card-body">
+          <div class="card-title">End of Day</div>
+          <div class="card-desc">Checklist harian &amp; tutup business date setelah semua input selesai.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+    </nav>
+  </div>
+
+  <div class="category-section" id="cat-laporan">
+    <div class="back-row">
+      <button class="back-btn-inline" onclick="backToCategories()">← Menu</button>
+    </div>
+    <div class="section-label">Laporan &amp; Analisa</div>
+    <nav class="menu">
+
+      <a class="menu-card accent-usage" href="usage-import/index.html">
+        <div class="icon-wrap icon-usage">📥</div>
+        <div class="card-body">
+          <div class="card-title">Import Usage &amp; Rekap Detail</div>
+          <div class="card-desc">Upload data penjualan, otomatis jadi Rekap Detail &amp; usage bahan baku via BOM.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+      <a class="menu-card accent-usage" href="hourly-sales/index.html">
+        <div class="icon-wrap icon-usage">⏱️</div>
+        <div class="card-body">
+          <div class="card-title">Hourly Sales Report</div>
+          <div class="card-desc">Import laporan penjualan per jam dari POS, lihat Sales/CC/Avg per jam per tanggal.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+      <a class="menu-card accent-forecast" href="forecast-order/index.html">
+        <div class="icon-wrap icon-forecast">📦</div>
+        <div class="card-body">
+          <div class="card-title">Forecasting Ordering</div>
+          <div class="card-desc">Perkiraan kebutuhan order berdasarkan stock &amp; usage, lengkap dengan riwayat.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+      <a class="menu-card accent-variance" href="variance-report/index.html">
+        <div class="icon-wrap icon-variance">📊</div>
+        <div class="card-body">
+          <div class="card-title">Laporan Variance</div>
+          <div class="card-desc">Analisa variance: opening, mutasi stock, expected vs ending stock.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+      <a class="menu-card accent-bom" href="bom-appetizer/index.html">
+        <div class="icon-wrap icon-bom">🍢</div>
+        <div class="card-body">
+          <div class="card-title">Kalkulator BOM Appetizer</div>
+          <div class="card-desc">Hitung kebutuhan bahan baku berdasarkan jumlah porsi.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+    </nav>
+  </div>
+
+  <div class="category-section" id="cat-pengaturan">
+    <div class="back-row">
+      <button class="back-btn-inline" onclick="backToCategories()">← Menu</button>
+    </div>
+    <div class="section-label">Pengaturan</div>
+    <nav class="menu">
+
+      <a class="menu-card accent-master" href="master-data/index.html">
+        <div class="icon-wrap icon-master">🗂️</div>
+        <div class="card-body">
+          <div class="card-title">Master Data</div>
+          <div class="card-desc">Kelola item bahan baku, resep/BOM menu, dan nama outlet.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+      <a class="menu-card accent-master" id="acctMgmtCard" href="account-management/index.html" style="display:none;">
+        <div class="icon-wrap icon-master">👤</div>
+        <div class="card-body">
+          <div class="card-title">Kelola Akun</div>
+          <div class="card-desc">Ganti password, kelola outlet, dan atur role akun. Khusus Admin.</div>
+        </div>
+        <div class="chevron">›</div>
+      </a>
+
+    </nav>
+  </div>
+
+</main>
+
+<footer id="mainFooter">
+  <div class="brand">Inventory ABBQ Indonesia</div>
+  <div class="code">FDL © 2026</div>
+</footer>
+
+<script>
+  const CATEGORY_IDS = ["harian", "tutup", "laporan", "pengaturan"];
+
+  function showCategory(id){
+    document.getElementById("categoryHome").classList.add("hidden");
+    CATEGORY_IDS.forEach(cid => {
+      document.getElementById("cat-" + cid).classList.toggle("active", cid === id);
+    });
+    document.getElementById("mainFooter").style.display = "none";
+    window.scrollTo(0, 0);
+    if(location.hash !== "#" + id) history.pushState({ cat: id }, "", "#" + id);
+  }
+
+  function backToCategories(){
+    document.getElementById("categoryHome").classList.remove("hidden");
+    CATEGORY_IDS.forEach(cid => {
+      document.getElementById("cat-" + cid).classList.remove("active");
+    });
+    document.getElementById("mainFooter").style.display = "";
+    window.scrollTo(0, 0);
+    if(location.hash) history.pushState({}, "", location.pathname + location.search);
+  }
+
+  // Dukung tombol Back HP: kalau lagi buka 1 kategori, tombol back
+  // kembali ke daftar kategori dulu (bukan langsung keluar app/login).
+  window.addEventListener("popstate", () => {
+    const id = location.hash.replace("#", "");
+    if(CATEGORY_IDS.includes(id)){
+      showCategory(id);
+    } else {
+      backToCategories();
+    }
+  });
+
+  // Kalau dibuka lewat link langsung dengan #hash (mis. dari bookmark),
+  // langsung buka kategori itu.
+  (function initFromHash(){
+    const id = location.hash.replace("#", "");
+    if(CATEGORY_IDS.includes(id)) showCategory(id);
+  })();
+</script>
+
+<script src="shared/local-db.js?v=1"></script>
+<script src="shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 0;</script>
+<script src="shared/auth-guard.js?v=47"></script>
+<script src="app.js?v=36"></script>
+<script>
+  (async () => {
+    try {
+      const bd = await InvDB.getBusinessDate();
+      const [y,m,d] = bd.split("-");
+      document.getElementById("bizDateValue").textContent = `${d}/${m}/${y}`;
+    } catch(e) {
+      console.error("Gagal memuat business date:", e);
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+[
+{
+"nomor":1,
+"kode":"120017",
+"item":"GOLDEN TOPPING 1KG/PAC ID",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":2,
+"kode":"120019",
+"item":"CHOCOLATE FILLING ID",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":3,
+"kode":"120256",
+"item":"PL BROWN SUGAR SAUCE 400GR/PAC",
+"konv":400,
+"uom":"G"
+},
+{
+"nomor":4,
+"kode":"120298",
+"item":"SAUCE TALIWANG 0.9KG/PAC",
+"konv":900,
+"uom":"G"
+},
+{
+"nomor":5,
+"kode":"120300",
+"item":"SAUCE KECOMBRANG 0.9KG/PAC",
+"konv":900,
+"uom":"G"
+},
+{
+"nomor":6,
+"kode":"120301",
+"item":"SAUCE SOLO 0.9KG/PAC",
+"konv":900,
+"uom":"G"
+},
+{
+"nomor":7,
+"kode":"120322",
+"item":"SAMBAL MATAH 174 PC/CTN",
+"konv":174,
+"uom":"PC"
+},
+{
+"nomor":8,
+"kode":"120323",
+"item":"SAMBAL DAUN JERUK 174 PC/CTN",
+"konv":174,
+"uom":"PC"
+},
+{
+"nomor":9,
+"kode":"120324",
+"item":"SAMBAL KECOMBRANG 174 PC/CTN",
+"konv":174,
+"uom":"PC"
+},
+{
+"nomor":10,
+"kode":"120336",
+"item":"AYAM BAKAR (DADA 4 PAC X 12 PCS /CAR)",
+"konv":12,
+"uom":"PC"
+},
+{
+"nomor":11,
+"kode":"120337",
+"item":"AYAM BAKAR (PAHA 4 PAC X 12 PCS /CAR)",
+"konv":12,
+"uom":"PC"
+},
+{
+"nomor":12,
+"kode":"120339",
+"item":"SAYUR ASAM BASE 307GR/PAC",
+"konv":307,
+"uom":"PAC"
+},
+{
+"nomor":13,
+"kode":"120340",
+"item":"CORN RIBS 300GR/PAC",
+"konv":300,
+"uom":"PAC"
+},
+{
+"nomor":14,
+"kode":"120342",
+"item":"PERKEDEL 10PCS/PAC",
+"konv":10,
+"uom":"PC"
+},
+{
+"nomor":15,
+"kode":"120350",
+"item":"SPRING ROLL 350GR/PAC",
+"konv":350,
+"uom":"PAC"
+},
+{
+"nomor":16,
+"kode":"125008",
+"item":"SMOKE MEAT 500GR/PAC",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":17,
+"kode":"129000",
+"item":"AYAM CUB 3PACX10PCS/CAR",
+"konv":10,
+"uom":"PC"
+},
+{
+"nomor":18,
+"kode":"129001",
+"item":"AYAM CUK 5PACX8PCS/CAR",
+"konv":8,
+"uom":"PC"
+},
+{
+"nomor":19,
+"kode":"172004",
+"item":"CHEESE MOZARELLA 1KG/PAC*",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":20,
+"kode":"172015",
+"item":"TEPUNG MAIZENA 1KG/PAC",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":21,
+"kode":"175374",
+"item":"ABBQ G 500GR/PAC",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":22,
+"kode":"290315",
+"item":"PREMIX PUDDING 300GR/PACK",
+"konv":300,
+"uom":"G"
+},
+{
+"nomor":23,
+"kode":"300030",
+"item":"CHEESE PROCESSED",
+"konv":2000,
+"uom":"G"
+},
+{
+"nomor":24,
+"kode":"300064",
+"item":"COCOA POWDER",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":25,
+"kode":"300085",
+"item":"DICED PEANUT",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":26,
+"kode":"300090",
+"item":"DRY PARSLEY",
+"konv":100,
+"uom":"G"
+},
+{
+"nomor":27,
+"kode":"300173",
+"item":"MAYONNAISE",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":28,
+"kode":"300400",
+"item":"BAWANG PUTIH KUPAS",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":29,
+"kode":"300483",
+"item":"FRESH EGGS",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":30,
+"kode":"300526",
+"item":"KETIMUN",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":31,
+"kode":"300568",
+"item":"LENGKUAS",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":32,
+"kode":"300574",
+"item":"DAUN SALAM",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":33,
+"kode":"300698",
+"item":"FRYING OIL 18L/CAR",
+"konv":18000,
+"uom":"ML"
+},
+{
+"nomor":34,
+"kode":"300770",
+"item":"GRANULATED SUGAR 1KG/PAC",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":35,
+"kode":"300833",
+"item":"MILK UHT FULL CREAM GF",
+"konv":1000,
+"uom":"ML"
+},
+{
+"nomor":36,
+"kode":"301017",
+"item":"GARAM DOLPIN",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":37,
+"kode":"301063",
+"item":"CHICKEN SEASONING R",
+"konv":460,
+"uom":"G"
+},
+{
+"nomor":38,
+"kode":"301125",
+"item":"KERUPUK UDANG 380GR/PAC",
+"konv":380,
+"uom":"PAC"
+},
+{
+"nomor":39,
+"kode":"301149",
+"item":"CABAI RAWIT HIJAU",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":40,
+"kode":"301165",
+"item":"BERAS PULEN",
+"konv":5000,
+"uom":"G"
+},
+{
+"nomor":41,
+"kode":"301169",
+"item":"EXTRA HOT BOTTLE J 330 ML",
+"konv":330,
+"uom":"ML"
+},
+{
+"nomor":42,
+"kode":"301180",
+"item":"KECAP MANIS BANGO (KG)",
+"konv":1500,
+"uom":"G"
+},
+{
+"nomor":43,
+"kode":"301543",
+"item":"TAHU 10 PC",
+"konv":10,
+"uom":"PC"
+},
+{
+"nomor":44,
+"kode":"301544",
+"item":"TEMPE 500 GRAM",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":45,
+"kode":"301546",
+"item":"KERUPUK BAWAL PUTIH",
+"konv":380,
+"uom":"G"
+},
+{
+"nomor":46,
+"kode":"301555",
+"item":"RACIK BUMBU TAHU TEMPE GORENG",
+"konv":20,
+"uom":"G"
+},
+{
+"nomor":47,
+"kode":"301556",
+"item":"BAWANG GORENG",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":48,
+"kode":"301572",
+"item":"PASTA PANDAN KOEPOE KOPOE",
+"konv":60,
+"uom":"ML"
+},
+{
+"nomor":49,
+"kode":"301573",
+"item":"PEWARNA COKLAT TUA",
+"konv":30,
+"uom":"ML"
+},
+{
+"nomor":50,
+"kode":"301577",
+"item":"EMPING MELINJO 1 KG",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":51,
+"kode":"301584",
+"item":"BOBA KING JELLY (AGAR RASA CINCAU)",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":52,
+"kode":"301587",
+"item":"BUMBU RACIK NASI UDUK",
+"konv":15,
+"uom":"G"
+},
+{
+"nomor":53,
+"kode":"301588",
+"item":"TEPUNG TERIGU 1KG",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":54,
+"kode":"301634",
+"item":"BERAS PULEN 5 KG",
+"konv":5000,
+"uom":"G"
+},
+{
+"nomor":55,
+"kode":"301635",
+"item":"NANGKA MUDA",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":56,
+"kode":"301636",
+"item":"PEPAYA MUDA",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":57,
+"kode":"301637",
+"item":"ASAM MUDA FRESH",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":58,
+"kode":"301638",
+"item":"MELINJO",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":59,
+"kode":"301639",
+"item":"DAUN MELINJO MUDA",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":60,
+"kode":"301640",
+"item":"KOL",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":61,
+"kode":"301641",
+"item":"KACANG TANAH DENGAN KULIT",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":62,
+"kode":"301642",
+"item":"KACANG PANJANG",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":63,
+"kode":"301643",
+"item":"JAGUNG MANIS",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":64,
+"kode":"301673",
+"item":"TEPUNG TAPIOKA",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":65,
+"kode":"301675",
+"item":"FRESH SINGKONG",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":66,
+"kode":"301676",
+"item":"KERTAS BERAS",
+"konv":300,
+"uom":"G"
+},
+{
+"nomor":67,
+"kode":"301678",
+"item":"PISANG KEPOK",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":68,
+"kode":"301685",
+"item":"SAMBAL BANGKOK",
+"konv":400,
+"uom":"G"
+},
+{
+"nomor":69,
+"kode":"301692",
+"item":"BREAD CRUMBS",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":70,
+"kode":"400135",
+"item":"PLASTIC WRAP 60 CM",
+"konv":1,
+"uom":"ROL"
+},
+{
+"nomor":71,
+"kode":"401694",
+"item":"A RICE WRAPPER 22.5 X 27 CM",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":72,
+"kode":"401831",
+"item":"A TRAY AYAM 1 LUBANG",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":73,
+"kode":"401832",
+"item":"A TRAY AYAM 3 LUBANG",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":74,
+"kode":"700099",
+"item":"TOWEL BROWN",
+"konv":12,
+"uom":"PC"
+},
+{
+"nomor":75,
+"kode":"700101",
+"item":"TOWEL BLUE",
+"konv":12,
+"uom":"PC"
+},
+{
+"nomor":76,
+"kode":"700102",
+"item":"TOWEL WHITE",
+"konv":12,
+"uom":"PC"
+},
+{
+"nomor":77,
+"kode":"700106",
+"item":"TRASH PLASTIC 90X120X.035",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":78,
+"kode":"700121",
+"item":"HAND GLOVE PLASTIC",
+"konv":100,
+"uom":"PC"
+},
+{
+"nomor":79,
+"kode":"700184",
+"item":"VINNYL HANDGLOVES",
+"konv":1,
+"uom":"PC"
+},
+{
+"nomor":80,
+"kode":"700481",
+"item":"PLAIN BOX DW 620X455X295",
+"konv":1,
+"uom":"PC"
+},
+{
+"nomor":81,
+"kode":"702682",
+"item":"RAUCHERGOLD (SMOKE CHIP)",
+"konv":20000,
+"uom":"G"
+}
+]

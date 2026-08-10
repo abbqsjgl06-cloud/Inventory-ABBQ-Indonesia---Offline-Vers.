@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Hourly Sales Report — Inventory ABBQ</title>
+<link rel="icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/inv-style.css?v=42">
+<style>
+  .checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0;}
+  #importPreview{display:none;margin-top:12px;}
+  .hs-day-table{margin-bottom:18px;}
+  .hs-day-title{font-weight:800;font-size:13px;margin:14px 0 6px;padding:8px 10px;background:var(--accent-tint);border-radius:8px;}
+  .hs-day-table table{table-layout:auto;}
+  .hs-day-table th, .hs-day-table td{box-sizing:border-box;font-size:12px;padding:6px 6px;}
+  .hs-day-table th:first-child, .hs-day-table td:first-child{width:44px;text-align:center;font-weight:700;}
+  .hs-day-table td.num{text-align:right;}
+  .hs-day-table tr.total-row td{font-weight:800;background:var(--paper);border-top:2px solid var(--ink);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">ABBQ Indonesia</div>
+    <div class="topbar-h1">Hourly Sales Report</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <div class="panel-title">📥 Upload Laporan Hourly POS</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+      Upload file Excel "Hourly POS Receipt Report" langsung dari sistem kasir (format kolom per jam:
+      Qty, Sales, Average - berulang untuk tiap jam, satu baris per tanggal). Aplikasi otomatis
+      mengonversi ke tampilan per jam per tanggal di bawah.
+    </p>
+    <div class="field">
+      <input type="file" id="fileInput" accept=".xlsx,.xls">
+    </div>
+    <button class="btn btn-primary" onclick="processFile()">⚙ Proses File</button>
+
+    <div id="importPreview">
+      <p style="font-size:13px;margin:12px 0 6px;" id="previewSummary"></p>
+      <button class="btn btn-primary" onclick="confirmImport()">💾 Konfirmasi &amp; Simpan</button>
+      <button class="btn btn-ghost" onclick="cancelImport()">Batal</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Filter Laporan</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal</label>
+        <input type="date" id="dateFrom">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal</label>
+        <input type="date" id="dateTo">
+      </div>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="showAll" onchange="toggleShowAll()">
+      <label for="showAll" style="margin:0;">Tampilkan semua tanggal yang pernah diupload (abaikan filter tanggal)</label>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary" style="width:auto;flex:1;" onclick="generateReport()">🔍 Tampilkan</button>
+      <button class="btn btn-secondary" style="width:auto;flex:1;" onclick="toggleSummary()" id="summaryToggleBtn">📊 Ringkasan per Tanggal</button>
+      <button class="btn btn-secondary" style="width:auto;flex:1;" onclick="exportExcel()">⬇ Export ke Excel</button>
+    </div>
+  </div>
+
+  <div id="summaryArea"></div>
+  <div id="reportArea"></div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../shared/xlsx.full.min.js?v=31"></script>
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+<script src="app.js?v=2"></script>
+</body>
+</html>

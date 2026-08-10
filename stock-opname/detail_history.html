@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
+
+    <title>Detail Stock Opname</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link
+        rel="stylesheet"
+        href="style.css?v=5">
+
+</head>
+
+<body>
+
+    <!-- NOTIFIKASI -->
+    <div
+        id="notif"
+        class="notif">
+    </div>
+
+    <div class="container">
+
+        <h2 id="judulHistory">
+
+            DETAIL STOCK OPNAME
+
+        </h2>
+
+        <div style="position:relative;margin:15px 0;">
+            <input type="text" id="searchItem" placeholder="🔍 Cari item atau kode..." oninput="renderTable()" style="width:100%;padding:12px 40px 12px 12px;font-size:16px;border:2px solid #E7E2D9;border-radius:8px;box-sizing:border-box;">
+            <button type="button" onclick="document.getElementById('searchItem').value='';renderTable();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:32px;height:32px;min-width:32px;left:auto;background:none;border:none;font-size:18px;line-height:1;color:#888;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">✕</button>
+        </div>
+
+        <div class="table-scroll-wrap">
+        <table class="table-stock">
+
+            <thead>
+
+                <tr>
+
+                    <th>No</th>
+
+                    <th style="cursor:pointer;" onclick="sortTable('kode')">Kode <span id="sortArrowKode"></span></th>
+
+                    <th style="cursor:pointer;" onclick="sortTable('item')">Item <span id="sortArrowItem"></span></th>
+
+                    <th>Konv</th>
+
+                    <th>UOM</th>
+
+                    <th>PCS/Gr</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="tableBody">
+
+            </tbody>
+
+        </table>
+        </div>
+
+        <br>
+
+        <div class="panel" style="border:2px solid #2E7D4F;border-radius:12px;padding:15px;margin-bottom:10px;">
+            <h3 style="margin-top:0;color:#2E7D4F;">🍳 Product Preparation</h3>
+            <p style="font-size:12px;color:#666;">
+                Kalau ada tambahan porsi produk yang di-prepare untuk laporan ini, input di sini.
+                Sistem otomatis menghitung kebutuhan bahan baku dari resep (BOM) dan
+                MENAMBAHKANNYA ke laporan ini begitu ditekan <b>UPDATE DATA</b> di bawah.
+            </p>
+            <div class="table-scroll-wrap">
+                <table class="table-prep">
+                    <thead>
+                        <tr>
+                            <th>Kode</th>
+                            <th>Nama</th>
+                            <th>Qty Porsi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prepTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <button onclick="updateData()">
+
+            UPDATE DATA
+
+        </button>
+
+        <br><br>
+
+        <button onclick="exportHistoryExcel()">
+
+            EXPORT EXCEL
+
+        </button>
+
+        <br><br>
+
+        <button onclick="window.location.href='history.html'">
+
+            KEMBALI
+
+        </button>
+
+    </div>
+
+    <div class="watermark">
+
+        © 2026 Fdl
+
+    </div>
+
+    <!-- FIREBASE -->
+    <script src="../shared/local-db.js?v=1"></script>
+    <script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+
+    <!-- XLSX -->
+    <script src="libraries/xlsx.full.min.js"></script>
+
+    <!-- DETAIL -->
+    <script src="calc-widget.js?v=2"></script>
+    <script src="detail_history.js?v=3"></script>
+
+</body>
+
+</html>

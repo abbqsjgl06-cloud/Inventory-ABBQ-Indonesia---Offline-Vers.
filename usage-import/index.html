@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Import Usage — Inventory ABBQ</title>
+<link rel="icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#0E8C8C; --accent-tint:#E1F2F2; }
+  thead th{background:var(--accent-tint);}
+  .step-badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:20px;height:20px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:11px;font-weight:800;
+    margin-right:8px;flex:none;
+  }
+  .flow-step{display:flex;align-items:flex-start;gap:0;font-size:12px;color:var(--muted);margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">ABBQ Indonesia</div>
+    <div class="topbar-h1">Import Usage (Data Penjualan)</div>
+  </div>
+  <div style="flex:none;display:flex;flex-direction:column;gap:6px;align-items:stretch;">
+    <a href="../rekap-menu/index.html" style="background:var(--accent-tint);color:var(--accent, #0E8C8C);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;text-align:center;">🧾 Rekap Detail</a>
+    <a id="rekapSummaryLink" href="../reports/index.html" style="display:none;background:var(--accent-tint);color:var(--accent, #0E8C8C);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;text-align:center;">📊 Rekap Summary</a>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <div class="panel-title">Cara Kerja</div>
+    <div class="flow-step"><span class="step-badge">1</span> Upload file penjualan menu (format kolom: Date, Code, Desc, Major, Family, Qty, Discount, Net Sales, RVC, Order Type)</div>
+    <div class="flow-step"><span class="step-badge">2</span> Sistem menjumlahkan Qty terjual per kode menu</div>
+    <div class="flow-step"><span class="step-badge">3</span> Setiap menu diterjemahkan ke bahan baku memakai BOM di Master Data</div>
+    <div class="flow-step"><span class="step-badge">4</span> Hasil usage per bahan baku otomatis dipakai di Laporan Variance</div>
+  </div>
+
+  <div class="panel" id="adminToolsBox" style="display:none;background:var(--accent-tint);border-color:var(--accent);">
+    <div class="panel-title">🛠 Alat Bantu Admin</div>
+    <button class="btn btn-secondary" onclick="downloadTemplate()" style="margin-bottom:10px;">⬇ Download Template Excel</button>
+    <button class="btn btn-secondary" onclick="showMenusWithoutBom()">📋 Lihat Menu Tanpa BOM</button>
+    <div id="noBomResult" style="display:none;margin-top:14px;"></div>
+  </div>
+
+  <div class="panel" id="noOutletWarning" style="display:none;background:#FCEBE9;border-color:#C23B2E;">
+    <div class="panel-title" style="color:#C23B2E;">⚠️ Pilih Outlet Dulu</div>
+    <p style="font-size:13px;color:#8A2E24;">
+      Switcher outlet di pojok kiri atas masih di "Semua Outlet". Data usage HARUS terikat ke
+      1 outlet spesifik - pilih outletnya dulu (mis. SJAB) sebelum upload/simpan, supaya
+      hasilnya benar-benar muncul di Rekap Detail &amp; Rekap Summary outlet tersebut.
+    </p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Upload File Penjualan</div>
+    <div class="field">
+      <label>File Penjualan (.xlsx / .xls / .csv)</label>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+      <div id="fileName" style="font-size:12px;color:var(--muted);margin-top:6px;"></div>
+    </div>
+
+    <div class="field">
+      <label>Nama Periode (label laporan)</label>
+      <input type="text" id="periodLabel" placeholder="cth Juni 2026">
+    </div>
+
+    <p id="dateWarning" style="display:none;font-size:12px;color:#8C2A1E;background:#FCEBE9;border-radius:8px;padding:10px 12px;margin-bottom:10px;"></p>
+
+    <div id="previewBox" style="display:none;">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-label">Baris Terbaca</div>
+          <div class="summary-value" id="rowsRead">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Menu Unik</div>
+          <div class="summary-value" id="menuUnik">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Menu Cocok BOM</div>
+          <div class="summary-value" id="menuMatched">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Menu Tanpa BOM</div>
+          <div class="summary-value neg" id="menuUnmatched">0</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="confirmImportBtn" onclick="confirmImport()">Simpan Hasil Usage</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Riwayat Import</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal</label>
+        <input type="date" id="histFilterStart">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal</label>
+        <input type="date" id="histFilterEnd">
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-bottom:12px;" onclick="applyHistoryFilter()">🔍 Tampilkan Riwayat</button>
+    <p style="font-size:11px;color:var(--muted);margin:-6px 0 12px;">Difilter berdasarkan rentang tanggal data di file; jika tanggal tidak terdeteksi saat import, dipakai waktu upload.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Rentang Tanggal Data (dari file)</th><th>Periode (Label)</th><th>Waktu Upload</th><th>File</th><th class="num">Baris</th><th class="num">Menu Tanpa BOM</th><th></th></tr></thead>
+        <tbody id="importHistoryBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">📈 Lihat Usage Harian &amp; Rata-rata 30 Hari</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+      Cari 1 item bahan baku untuk lihat usage per tanggal (dari data yang sudah diupload dengan kolom tanggal) dan rata-rata harian 30 hari terakhir — angka rata-rata ini yang dipakai Forecasting Ordering.
+    </p>
+    <div class="field" style="position:relative;">
+      <input type="text" id="dailyUsageSearch" placeholder="Cari kode atau nama bahan baku..." autocomplete="off">
+      <div class="suggest-list" id="dailyUsageSuggestList"></div>
+    </div>
+    <div id="dailyUsageResult" style="display:none;">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-label">Total 30 Hari</div>
+          <div class="summary-value" id="dailyUsageTotal">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Rata-rata / Hari</div>
+          <div class="summary-value" id="dailyUsageAvg">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Hari Ada Data</div>
+          <div class="summary-value" id="dailyUsageDaysCount">0</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tanggal</th><th class="num">Qty Terpakai</th></tr></thead>
+          <tbody id="dailyUsageBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="dailyUsageEmpty" style="display:none;font-size:12px;color:var(--muted);">Belum ada data usage harian untuk item ini dalam 30 hari terakhir.</div>
+  </div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../shared/xlsx.full.min.js?v=25"></script>
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+<script src="../shared/seed-data.js?v=25"></script>
+<script src="../shared/ui-dialog.js?v=41"></script>
+<script src="app.js?v=42"></script>
+</body>
+</html>

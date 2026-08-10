@@ -1,0 +1,449 @@
+/* =========================
+   GLOBAL
+   Reskin: sekarang pakai token warna/tipografi yang SAMA dengan
+   shared/inv-style.css (dipakai modul lain: Financial, Transfer,
+   End of Day, dst) supaya tampilan Stock Opname konsisten dengan
+   menu utama & modul lain, tanpa mengubah struktur HTML/JS yang
+   sudah ada (semua nama class/id di bawah TETAP SAMA).
+========================= */
+
+:root{
+    --ink:#1C1B19;
+    --paper:#FAF7F2;
+    --card:#FFFFFF;
+    --line:#E7E2D9;
+    --muted:#79746B;
+    --accent:#1C1B19;
+    --accent-tint:#EFEBE3;
+    --good:#2E7D4F;
+    --good-tint:#E6F3EC;
+    --bad:#C23B2E;
+    --bad-tint:#FCEBE9;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+}
+
+.container{
+    width:100%;
+    max-width:640px;
+    margin:auto;
+    padding:56px 18px 20px;
+}
+
+/* =========================
+   LOGO
+========================= */
+
+.logo{
+    width:72px;
+    height:72px;
+    object-fit:contain;
+    border-radius:16px;
+    display:block;
+    margin:0 auto 14px;
+}
+
+/* =========================
+   TITLE
+========================= */
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+    color:var(--ink);
+    font-weight:800;
+    letter-spacing:-0.01em;
+}
+
+h2{
+    text-align:center;
+    margin-bottom:20px;
+    color:var(--ink);
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:-0.01em;
+}
+
+h3{
+    margin-bottom:10px;
+    color:var(--ink);
+    font-weight:700;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-group{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+    margin-bottom:6px;
+    font-weight:600;
+    font-size:12px;
+    color:var(--muted);
+}
+
+input,
+select{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--paper);
+    color:var(--ink);
+    font-size:15px;
+    font-family:inherit;
+}
+
+input:focus,
+select:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+}
+
+/* =========================
+   BUTTON
+========================= */
+
+button{
+    width:100%;
+    padding:13px 18px;
+    background:#FFD400;
+    color:#1C1B19;
+    border:none;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:700;
+    font-family:inherit;
+    cursor:pointer;
+    transition:.2s;
+}
+
+button:hover{
+    opacity:.9;
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.table-scroll-wrap{
+    width:100%;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    margin-top:20px;
+}
+
+.table-stock{
+    width:100%;
+    max-width:560px;
+    margin:0 auto;
+    table-layout:fixed;
+    border-collapse:collapse;
+    margin-top:0;
+}
+
+.table-stock th{
+    background:var(--accent-tint);
+    color:var(--ink);
+    border:1px solid var(--line);
+    padding:6px 4px;
+    text-align:center;
+    font-size:11px;
+    white-space:normal;
+    overflow-wrap:break-word;
+}
+
+.table-stock td{
+    border:1px solid var(--line);
+    padding:6px 4px;
+    text-align:center;
+    font-size:12px;
+    white-space:normal;
+    overflow-wrap:break-word;
+}
+
+/* Tabel dibuat table-layout:fixed dengan lebar tiap kolom ditentukan
+   di sini (bukan sticky/geser lagi) - No/Kode/Konv/UOM dipersempit,
+   Item boleh 2 baris, supaya SEMUA kolom termasuk input Qty di paling
+   kanan selalu kelihatan penuh di layar HP tanpa perlu geser sama
+   sekali. Sebelumnya kolom No/Kode/Item dibuat "sticky" nempel di
+   kiri, tapi itu yang bikin kolom Qty di kanan malah ketutupan/hilang
+   saat digeser - jadi pendekatan sticky itu dilepas total.
+   Total lebar berikut sengaja pas dengan layar HP standar (~360-400px)
+   ditambah padding kolom. */
+.table-stock th:nth-child(1), .table-stock td:nth-child(1){ width:22px; padding-left:2px; padding-right:2px; }
+.table-stock th:nth-child(2), .table-stock td:nth-child(2){ width:54px; padding-left:2px; padding-right:2px; }
+.table-stock th:nth-child(3), .table-stock td:nth-child(3){ text-align:left; width:auto; }
+.table-stock th:nth-child(4), .table-stock td:nth-child(4){ width:32px; padding-left:2px; padding-right:2px; font-size:10px; white-space:nowrap; }
+.table-stock th:nth-child(5), .table-stock td:nth-child(5){ width:28px; padding-left:2px; padding-right:2px; }
+.table-stock th:nth-child(6), .table-stock td:nth-child(6){ width:62px; padding-left:2px; padding-right:2px; }
+
+/* =========================
+   INPUT PCS
+========================= */
+
+.qty-input{
+    width:52px;
+    font-size:13px;
+    padding:4px 2px;
+    text-align:center;
+}
+
+.qty-with-calc{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+}
+.calc-btn{
+    flex:none;
+    width:26px;
+    height:26px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink);
+    font-size:14px;
+    line-height:1;
+    cursor:pointer;
+    padding:0;
+}
+.calc-btn:active{ background:var(--accent-tint); }
+
+/* =========================
+   TABLE - PRODUCT PREPARATION (3 kolom: Kode, Nama, Qty)
+   Class terpisah dari .table-stock supaya TIDAK ikut kena aturan
+   lebar kolom ke-1/2/3/4/5/6 di atas (yang dirancang khusus utk
+   tabel 6 kolom) - itu penyebab kolom Qty di Product Preparation
+   sempat melebar penuh layar.
+========================= */
+
+.table-prep{
+    width:100%;
+    table-layout:fixed;
+    border-collapse:collapse;
+}
+.table-prep th{
+    background:var(--accent-tint);
+    color:var(--ink);
+    border:1px solid var(--line);
+    padding:6px 4px;
+    text-align:center;
+    font-size:11px;
+}
+.table-prep td{
+    border:1px solid var(--line);
+    padding:6px 4px;
+    text-align:center;
+    font-size:12px;
+    white-space:normal;
+    overflow-wrap:break-word;
+}
+.table-prep th:nth-child(1), .table-prep td:nth-child(1){ width:70px; }
+.table-prep th:nth-child(2), .table-prep td:nth-child(2){ text-align:left; width:auto; }
+.table-prep th:nth-child(3), .table-prep td:nth-child(3){ width:70px; }
+.table-prep .qty-input{ width:60px; }
+
+/* =========================
+   HISTORY CARD
+========================= */
+
+.history-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px;
+    margin-bottom:16px;
+    box-shadow:0 1px 2px rgba(28,27,25,.04);
+}
+
+.history-card p{
+    margin:8px 0;
+}
+
+/* =========================
+   HISTORY TABLE (compact)
+========================= */
+
+.history-table-wrap{
+    overflow-x:auto;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:0 1px 2px rgba(28,27,25,.04);
+}
+
+.history-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    min-width:640px;
+}
+
+.history-table thead th{
+    background:var(--accent-tint);
+    color:var(--ink);
+    text-align:left;
+    padding:10px 8px;
+    font-weight:700;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    white-space:nowrap;
+    border-bottom:2px solid var(--line);
+}
+
+.history-table tbody td{
+    padding:9px 8px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+}
+
+.history-table tbody tr:hover{
+    background:var(--paper);
+}
+
+.eod-badge{
+    display:inline-block;
+    font-size:10px;
+    font-weight:700;
+    color:var(--good);
+    background:var(--good-tint);
+    border-radius:999px;
+    padding:2px 8px;
+    margin-left:6px;
+}
+
+.history-table .btn-buka{
+    background:#f1c40f;
+    color:#1C1B19;
+    border:none;
+    border-radius:8px;
+    padding:7px 14px;
+    font-weight:700;
+    font-size:12px;
+    cursor:pointer;
+}
+
+/* =========================
+   FILTER / EMPTY STATE
+========================= */
+
+.filter-box{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px;
+    margin-bottom:20px;
+    box-shadow:0 1px 2px rgba(28,27,25,.04);
+}
+
+.filter-box label{
+    font-weight:600;
+    margin-top:10px;
+}
+
+.filter-box button{
+    margin-top:15px;
+}
+
+.filter-box button+button{
+    margin-top:10px;
+    background:var(--card);
+    color:var(--ink);
+    border:1px solid var(--line);
+}
+
+.empty-history{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:50px 20px;
+    text-align:center;
+    box-shadow:0 1px 2px rgba(28,27,25,.04);
+}
+
+.empty-icon{
+    font-size:60px;
+    margin-bottom:15px;
+}
+
+.empty-history h3{
+    margin:10px 0;
+}
+
+.empty-history p{
+    color:var(--muted);
+    line-height:1.6;
+}
+
+/* =========================
+   NOTIFIKASI
+========================= */
+
+.notif{
+    display:none;
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    color:#fff;
+    padding:15px 25px;
+    border-radius:10px;
+    font-weight:700;
+    z-index:9999;
+}
+
+.notif.success{
+    background:var(--good);
+}
+
+.notif.error{
+    background:var(--bad);
+}
+
+/* =========================
+   WATERMARK
+========================= */
+
+.watermark{
+    text-align:center;
+    margin:25px 0;
+    color:var(--muted);
+    font-size:12px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+    .container{
+        padding:56px 12px 12px;
+    }
+    .qty-input{
+        width:46px;
+        padding:3px;
+    }
+    button{
+        font-size:14px;
+    }
+}

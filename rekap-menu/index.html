@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Rekap Detail — Inventory ABBQ</title>
+<link rel="icon" href="../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#7A4FBF; --accent-tint:#EFE9FB; }
+  .checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0;}
+
+  /* ==========================================
+     Kolom "Menu" dibekukan (frozen) dengan cara yang PALING andal:
+     dipisah jadi 2 tabel bersebelahan di dalam 1 kontainer yang
+     scroll VERTIKAL-nya digabung (report-split), sementara HANYA
+     panel kanan (tanggal) yang bisa discroll HORIZONTAL. Kolom kiri
+     (Menu) sama sekali tidak ikut discroll krn memang di luar area
+     overflow-x - jadi tidak ada lagi ketergantungan pada
+     position:sticky (yang ternyata tidak didukung penuh di sebagian
+     WebView) ataupun sinkronisasi manual pakai JS/transform (yang
+     bikin getar & bisa meleset lewat batas konten kalau timing-nya
+     tidak pas). Tinggi tiap baris dikunci sama persis di 2 tabel ini
+     (lihat aturan tr.data-row / tr.cat-header-row) supaya barisnya
+     tetap sejajar.
+  ========================================== */
+  .report-split{
+    display:inline-flex;
+    max-width:100%;
+    align-items:flex-start;
+    max-height:70vh;
+    overflow-y:auto;
+    overflow-x:hidden;
+    background:var(--card,#fff);
+    border:1px solid var(--line,#E7E2D9);
+    border-radius:12px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .report-fixed{
+    flex:none;
+    width:132px;
+    border-right:1px solid var(--line,#E7E2D9);
+  }
+  .report-fixed table{ width:100%; border-collapse:collapse; }
+  .report-scroll{
+    flex:0 1 auto;
+    min-width:0;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .report-scroll table{ border-collapse:collapse; width:max-content; }
+
+  #reportHeadFixed, #reportBodyNames td,
+  #reportHead th, #reportBody td{
+    font-size:12px;
+    padding:6px 8px;
+    box-sizing:border-box;
+  }
+  #reportHeadFixed, #reportHead th{
+    background:var(--accent-tint);
+    position:-webkit-sticky;position:sticky;top:0;
+    z-index:2;
+  }
+  #reportBody td.num{ text-align:right; white-space:nowrap; }
+  #reportBodyNames td{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:132px;
+  }
+  #reportBodyNames td .menu-name{
+    display:block;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  #reportBodyNames td .menu-code{
+    display:block;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    color:var(--muted,#79746B);
+    font-weight:400;
+    font-size:11px;
+  }
+
+  /* Tinggi baris dikunci SAMA di kedua tabel supaya baris nama menu
+     (kiri) & baris angka tanggal (kanan) tetap sejajar persis. */
+  tr.data-row{ height:44px; }
+  tr.cat-header-row{ height:30px; }
+  #reportBodyNames tr.cat-header-row td, #reportBody tr.cat-header-row td{
+    background:var(--accent-tint);
+    font-weight:800;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">ABBQ Indonesia</div>
+    <div class="topbar-h1">Rekap Detail</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel admin-only" id="panelKelolaMenu" style="display:none;border:2px solid #7A4FBF;">
+    <div class="panel-title">🛠 Kelola Daftar Menu (Admin)</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+      Tambah atau hapus menu dari daftar Rekap Detail di bawah, berdasarkan kode item &amp; nama
+      deskripsi. Kategori yang sudah ada bisa dipakai lagi (ketik persis sama), atau ketik nama
+      kategori baru untuk membuat kelompok baru.
+    </p>
+    <div class="field-row">
+      <div class="field">
+        <label>Kategori</label>
+        <input type="text" id="newMenuItemCategory" placeholder="mis. Menu Paket" list="categoryOptions">
+        <datalist id="categoryOptions">
+          <option value="Voucher"><option value="Menu Paket"><option value="Menu (in Paket)">
+          <option value="Pendamping Paket (P)"><option value="Menu Tambahan (Only Alacarte)">
+          <option value="Minuman"><option value="Dessert"><option value="Makanan Ringan"><option value="Kerupuk">
+        </datalist>
+      </div>
+      <div class="field">
+        <label>Kode Item</label>
+        <input type="text" id="newMenuItemCode" placeholder="mis. 1121009">
+      </div>
+    </div>
+    <div class="field">
+      <label>Nama Deskripsi</label>
+      <input type="text" id="newMenuItemName" placeholder="mis. ABBQ SPESIAL">
+    </div>
+    <button class="btn btn-primary" onclick="addMenuItem()">+ Tambah ke Daftar</button>
+
+    <div class="field" style="margin-top:14px;">
+      <label>Cari di Daftar</label>
+      <input type="text" id="menuItemSearch" placeholder="Cari kategori/kode/nama..." oninput="renderAdminMenuItemList()">
+    </div>
+    <div class="table-wrap" style="max-height:300px;">
+      <table>
+        <thead><tr><th>Kategori</th><th>Kode</th><th>Nama</th><th></th></tr></thead>
+        <tbody id="menuItemAdminBody"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);">
+      <div class="panel-title" style="font-size:13px;">📄 Ubah Lewat Excel (ganti seluruh daftar)</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+        Download daftar yang sedang aktif, ubah langsung di Excel (tambah/hapus/urutkan baris,
+        atau ganti nama kategori), lalu upload lagi file yang sama di sini. Seluruh daftar Rekap
+        Menu akan DIGANTI persis sesuai isi file (bukan ditambahkan).
+      </p>
+      <button class="btn btn-secondary" onclick="downloadMenuItemTemplate()" style="margin-bottom:10px;">⬇ Download Template / Daftar Saat Ini</button>
+      <input type="file" id="menuItemUploadFile" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleMenuItemUpload(event)">
+      <button class="btn btn-primary" onclick="document.getElementById('menuItemUploadFile').click()">⬆ Upload &amp; Ganti Daftar</button>
+      <div id="menuItemUploadResult" style="font-size:12px;margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Filter Rekap Detail</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+      Rekap qty terjual per hari untuk daftar menu yang dipakai outlet ini,
+      dikelompokkan per kategori. Data diambil dari hasil <b>Import Usage</b>
+      yang sudah diupload dengan kolom tanggal per baris.
+    </p>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal</label>
+        <input type="date" id="dateFrom">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal</label>
+        <input type="date" id="dateTo">
+      </div>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="onlyWithSales" checked onchange="renderReport()">
+      <label for="onlyWithSales" style="margin:0;">Sembunyikan menu yang tidak ada penjualan sama sekali di rentang ini</label>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary" style="width:auto;flex:1;" onclick="generateReport()">🔍 Tampilkan</button>
+      <button class="btn btn-secondary" style="width:auto;flex:1;" onclick="exportExcel()">⬇ Export ke Excel</button>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-label">Jumlah Hari</div>
+      <div class="summary-value" id="summaryDays">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Menu Ditampilkan</div>
+      <div class="summary-value" id="summaryItems">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Total Terjual</div>
+      <div class="summary-value" id="summaryTotal">0</div>
+    </div>
+  </div>
+
+  <div class="report-split" id="reportSplit">
+    <div class="report-fixed">
+      <table>
+        <thead><tr><th id="reportHeadFixed">Menu</th></tr></thead>
+        <tbody id="reportBodyNames"></tbody>
+      </table>
+    </div>
+    <div class="report-scroll" id="reportTableWrap">
+      <table>
+        <thead><tr id="reportHead"></tr></thead>
+        <tbody id="reportBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../shared/xlsx.full.min.js?v=31"></script>
+<script src="../shared/local-db.js?v=1"></script>
+<script src="../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 1;</script>
+<script src="../shared/auth-guard.js?v=46"></script>
+<script src="../shared/ui-dialog.js?v=41"></script>
+<script src="app.js?v=7"></script>
+</body>
+</html>

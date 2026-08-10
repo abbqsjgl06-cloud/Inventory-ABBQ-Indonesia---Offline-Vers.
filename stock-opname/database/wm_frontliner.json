@@ -1,0 +1,585 @@
+[
+{
+"nomor":1,
+"kode":"301247",
+"item":"CONDENSED MILK 365GR",
+"konv":365,
+"uom":"G"
+},
+{
+"nomor":2,
+"kode":"300176",
+"item":"MILK FRESH",
+"konv":946,
+"uom":"ML"
+},
+{
+"nomor":3,
+"kode":"300223",
+"item":"COCONUT JELLY",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":4,
+"kode":"300246",
+"item":"TEA EARL GREY",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":5,
+"kode":"300247",
+"item":"TEA ENGLISH BREAKFAST",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":6,
+"kode":"300249",
+"item":"TEA PURE CAMOMILE",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":7,
+"kode":"300250",
+"item":"TEA SENCHA",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":8,
+"kode":"300310",
+"item":"DAUN PANDAN",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":9,
+"kode":"300645",
+"item":"FRESH FRUIT RED DRAGON FRUIT",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":10,
+"kode":"300702",
+"item":"ICE TEA F",
+"konv":625,
+"uom":"G"
+},
+{
+"nomor":11,
+"kode":"301123",
+"item":"BLACK TEA L",
+"konv":100,
+"uom":"PC"
+},
+{
+"nomor":12,
+"kode":"301153",
+"item":"EVAPORATED MILK C",
+"konv":405,
+"uom":"G"
+},
+{
+"nomor":13,
+"kode":"301225",
+"item":"SIRUP FRUKTOSA",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":14,
+"kode":"301254",
+"item":"ITOEN OI OCHA",
+"konv":1,
+"uom":"BT"
+},
+{
+"nomor":15,
+"kode":"301255",
+"item":"ITOEN JASMINE GREEN",
+"konv":1,
+"uom":"BT"
+},
+{
+"nomor":16,
+"kode":"301295",
+"item":"SANTAN POWDER",
+"konv":20,
+"uom":"G"
+},
+{
+"nomor":17,
+"kode":"301325",
+"item":"BASIL SEEDS (BIJI SELASIH) 50GR",
+"konv":50,
+"uom":"G"
+},
+{
+"nomor":18,
+"kode":"301362",
+"item":"GULA MERAH POHON LONTAR",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":19,
+"kode":"301443",
+"item":"PEACH HALVES IN LIGHT",
+"konv":460,
+"uom":"G"
+},
+{
+"nomor":20,
+"kode":"301449",
+"item":"AIR MINUM PH TINGGI SNI",
+"konv":1,
+"uom":"BT"
+},
+{
+"nomor":21,
+"kode":"301569",
+"item":"BOBA KING JACKFRUIT JELLY",
+"konv":2000,
+"uom":"G"
+},
+{
+"nomor":22,
+"kode":"301570",
+"item":"CENDOL",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":23,
+"kode":"301571",
+"item":"CRYSTAL JELLY COCO PANDAN",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":24,
+"kode":"301585",
+"item":"COCONUT JELLY SET B REV00",
+"konv":2000,
+"uom":"G"
+},
+{
+"nomor":25,
+"kode":"301589",
+"item":"MARJAN SYRUP COCOPANDAN",
+"konv":460,
+"uom":"ML"
+},
+{
+"nomor":26,
+"kode":"301590",
+"item":"CAMELLIA OOLONG TEA",
+"konv":500,
+"uom":"G"
+},
+{
+"nomor":27,
+"kode":"301627",
+"item":"PEACH JUICE BEVERAGE CONCENTRATE",
+"konv":1200,
+"uom":"G"
+},
+{
+"nomor":28,
+"kode":"301660",
+"item":"FRESH FRUIT WATERMELON",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":29,
+"kode":"301661",
+"item":"KOLANG KALING",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":30,
+"kode":"301663",
+"item":"SAGO MUTIARA DRY",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":31,
+"kode":"301664",
+"item":"FRUIT JERUK PERAS",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":32,
+"kode":"301665",
+"item":"CINCAU HITAM",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":33,
+"kode":"301666",
+"item":"FRESH FRUIT AVOCADO",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":34,
+"kode":"301667",
+"item":"HONEY ALSHIFA",
+"konv":250,
+"uom":"G"
+},
+{
+"nomor":35,
+"kode":"301671",
+"item":"TAPE",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":36,
+"kode":"301672",
+"item":"NANGKA FRESH",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":37,
+"kode":"301679",
+"item":"MELON",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":38,
+"kode":"301680",
+"item":"KELAPA MUDA",
+"konv":1,
+"uom":"PC"
+},
+{
+"nomor":39,
+"kode":"301681",
+"item":"CENDOL DAUN SUJI",
+"konv":1000,
+"uom":"G"
+},
+
+{
+"nomor":40,
+"kode":"400103",
+"item":"PLASTIC HD 50X75CM",
+"konv":100,
+"uom":"G"
+},
+{
+"nomor":41,
+"kode":"400128",
+"item":"PLASTIC PE 20X30X0.10",
+"konv":100,
+"uom":"G"
+},
+{
+"nomor":42,
+"kode":"400136",
+"item":"PLASTIC ZIP LOCKED 7X10",
+"konv":100,
+"uom":"PC"
+},
+{
+"nomor":43,
+"kode":"400158",
+"item":"STIRRER 15CM",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":44,
+"kode":"400936",
+"item":"CONTAINER PLASTIC SQUARE 1000 ML TAKE AW",
+"konv":23,
+"uom":"PC"
+},
+{
+"nomor":45,
+"kode":"401033",
+"item":"CONTAINER PLASTIC ROUND 300 ML TAKE AWAY",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":46,
+"kode":"401059",
+"item":"PLASTIC HD 15X30 (250GR/PCK)",
+"konv":100,
+"uom":"G"
+},
+{
+"nomor":47,
+"kode":"401262",
+"item":"PL SENDOK MOUSSE",
+"konv":100,
+"uom":"G"
+},
+{
+"nomor":48,
+"kode":"401693",
+"item":"A SPUNBOND BAG 2 SISI",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":49,
+"kode":"401698",
+"item":"A PAPER BOX",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":50,
+"kode":"401699",
+"item":"A PAPER CUP 12 OZ",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":51,
+"kode":"401700",
+"item":"A PLASTIC CUP 12 OZ",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":52,
+"kode":"401701",
+"item":"A PLASTIC CUP 18 OZ",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":53,
+"kode":"401702",
+"item":"A PLASTIC BAG SMALL",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":54,
+"kode":"401704",
+"item":"FLAT LID CAKE JAR",
+"konv":100,
+"uom":"PC"
+},
+{
+"nomor":55,
+"kode":"401714",
+"item":"A LID HOT PAPER CUP POLOS",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":56,
+"kode":"401729",
+"item":"A POINTED STRAW WRAPPED 21 CM",
+"konv":100,
+"uom":"G"
+},
+{
+"nomor":57,
+"kode":"401731",
+"item":"PLASTIC ROLL SEALER PET CUP POLOS",
+"konv":1,
+"uom":"ROL"
+},
+{
+"nomor":58,
+"kode":"401748",
+"item":"A PLASTIC KERUPUK",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":59,
+"kode":"401749",
+"item":"A PLASTIC BAG BIG",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":60,
+"kode":"401780",
+"item":"DOME FLAT LID",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":61,
+"kode":"401805",
+"item":"A CUP SINGLE 240ML POLOS",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":62,
+"kode":"401810",
+"item":"A PAPER BOWL 650ML",
+"konv":25,
+"uom":"SET"
+},
+{
+"nomor":63,
+"kode":"401813",
+"item":"A BROWN BAG TAKE AWAY 12.5 X 24.5 X 8 CM",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":64,
+"kode":"401926",
+"item":"A SAUCE CUP 35ML",
+"konv":50,
+"uom":"PC"
+},
+
+{
+"nomor":65,
+"kode":"700000",
+"item":"2 PCS CUP HOLDER",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":66,
+"kode":"700030",
+"item":"FACE MASK 3 PLY",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":67,
+"kode":"700098",
+"item":"GAS PORTABLE",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":68,
+"kode":"700103",
+"item":"HEADCAP",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":69,
+"kode":"700104",
+"item":"ISOLATAPE BENING 0.5X66MM",
+"konv":1,
+"uom":"ROL"
+},
+{
+"nomor":70,
+"kode":"700105",
+"item":"CLEAR CELLOTAPE 48MM-40MIC",
+"konv":1,
+"uom":"ROL"
+},
+{
+"nomor":71,
+"kode":"700174",
+"item":"THERMAL PAPER 79MM",
+"konv":1,
+"uom":"ROL"
+},
+{
+"nomor":72,
+"kode":"700178",
+"item":"PLAIN TISSUE",
+"konv":625,
+"uom":"G"
+},
+{
+"nomor":73,
+"kode":"700197",
+"item":"STICKER TOM & JERRY NO.102",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":74,
+"kode":"700617",
+"item":"CABLE TIES WHITE",
+"konv":100,
+"uom":"PC"
+},
+{
+"nomor":75,
+"kode":"700799",
+"item":"WHITE SUGAR FOR OUTLET",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":76,
+"kode":"701072",
+"item":"PLASTIC FORK J",
+"konv":100,
+"uom":"PC"
+},
+{
+"nomor":77,
+"kode":"701737",
+"item":"PLASTIC SPOON R PUTIH",
+"konv":100,
+"uom":"PC"
+},
+{
+"nomor":78,
+"kode":"702846",
+"item":"A WHITE SUGAR",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":79,
+"kode":"702847",
+"item":"A TISSUE ONE COLOR",
+"konv":155,
+"uom":"G"
+},
+{
+"nomor":80,
+"kode":"702935",
+"item":"A STICKER EMPING MELINJO 200PC/PAC",
+"konv":2,
+"uom":"PC"
+},
+{
+"nomor":81,
+"kode":"702937",
+"item":"A STICKER KERUPUK IKAN",
+"konv":2,
+"uom":"PC"
+},
+{
+"nomor":82,
+"kode":"702938",
+"item":"A STICKER KERUPUK UDANG",
+"konv":2,
+"uom":"PC"
+},
+{
+"nomor":83,
+"kode":"703150",
+"item":"A FORK PUTIH",
+"konv":100,
+"uom":"PC"
+}
+]

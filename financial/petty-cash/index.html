@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Tracking Petty Cash — Financial ABBQ</title>
+<link rel="icon" href="../../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#0D7A5F; --accent-tint:#E2F5EF; }
+  thead th{background:var(--accent-tint);}
+  .pc-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px;}
+  .pc-summary-card{flex:1;min-width:100px;background:#F5F1E8;border-radius:12px;padding:12px 14px;}
+  .pc-summary-card .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;}
+  .pc-summary-card .value{font-size:17px;font-weight:800;}
+  .pc-summary-card.saldo-akhir{background:#FBEBC7;}
+  .pc-summary-card.usage{background:#FCEBE9;}
+  .photo-thumb{width:36px;height:36px;object-fit:cover;border-radius:6px;cursor:pointer;}
+
+  /* PERBAIKAN: sebelumnya pakai table-layout:fixed dengan lebar kolom
+     dalam px, tapi lupa padding ikut menambah lebar asli (box-sizing
+     default browser itu content-box) - total lebar kolom jadi lebih
+     dari layar, kolom Deskripsi/Item yang tidak dikasih lebar eksplisit
+     akhirnya "kebagian" lebar negatif/nyaris nol, jadi tiap HURUF
+     turun baris sendiri-sendiri. Sekarang pakai table-layout:auto
+     (bukan fixed) + box-sizing:border-box supaya perhitungan lebar
+     aman, dan kolom Deskripsi dikasih lebar minimum yang wajar supaya
+     bisa wrap 2-3 baris dengan enak dibaca.
+  */
+  .pc-hist-table-wrap table, .pc-reimb-table-wrap table{
+    table-layout:auto;
+  }
+  .pc-hist-table-wrap th, .pc-hist-table-wrap td,
+  .pc-reimb-table-wrap th, .pc-reimb-table-wrap td{
+    box-sizing:border-box;
+    padding:6px 5px;
+    font-size:11.5px;
+  }
+
+  .pc-hist-table-wrap th:nth-child(1), .pc-hist-table-wrap td:nth-child(1){ width:20px; padding-left:3px; padding-right:1px; }
+  .pc-hist-table-wrap th:nth-child(2), .pc-hist-table-wrap td:nth-child(2){ width:50px; }
+  .pc-hist-table-wrap th:nth-child(3), .pc-hist-table-wrap td:nth-child(3){ width:48px; }
+  .pc-hist-table-wrap th:nth-child(4), .pc-hist-table-wrap td:nth-child(4){ min-width:80px; }
+  .pc-hist-table-wrap th:nth-child(5), .pc-hist-table-wrap td:nth-child(5){ width:58px; }
+  .pc-hist-table-wrap th:nth-child(6), .pc-hist-table-wrap td:nth-child(6){ width:38px; }
+  .pc-hist-table-wrap th:nth-child(7), .pc-hist-table-wrap td:nth-child(7){ width:46px; }
+
+  .pc-reimb-table-wrap th:nth-child(1), .pc-reimb-table-wrap td:nth-child(1){ width:26px; padding-left:3px; padding-right:1px; }
+  .pc-reimb-table-wrap th:nth-child(2), .pc-reimb-table-wrap td:nth-child(2){ width:48px; }
+  .pc-reimb-table-wrap th:nth-child(3), .pc-reimb-table-wrap td:nth-child(3){ width:48px; }
+  .pc-reimb-table-wrap th:nth-child(4), .pc-reimb-table-wrap td:nth-child(4){ width:48px; }
+  .pc-reimb-table-wrap th:nth-child(5), .pc-reimb-table-wrap td:nth-child(5){ min-width:80px; }
+  .pc-reimb-table-wrap th:nth-child(6), .pc-reimb-table-wrap td:nth-child(6){ width:58px; }
+  .pc-reimb-table-wrap th:nth-child(7), .pc-reimb-table-wrap td:nth-child(7){ width:44px; }
+
+
+  /* Tombol aksi (Edit/Hapus, Foto/Batalkan) ditumpuk vertikal supaya
+     rapi di kolom yang sempit, bukan saling desak horizontal. */
+  .pc-hist-table-wrap td:nth-child(7) .btn,
+  .pc-reimb-table-wrap td:nth-child(7) .btn{
+    display:block; width:100%; margin-bottom:3px; padding:3px 4px !important;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">Financial</div>
+    <div class="topbar-h1">Tracking Petty Cash</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <div class="panel-title">💰 Summary</div>
+    <div class="pc-summary">
+      <div class="pc-summary-card">
+        <div class="label">Saldo Awal</div>
+        <div class="value" id="sumSaldoAwal">Rp 0</div>
+      </div>
+      <div class="pc-summary-card usage">
+        <div class="label">Total Penggunaan</div>
+        <div class="value" id="sumUsage">Rp 0</div>
+      </div>
+      <div class="pc-summary-card saldo-akhir">
+        <div class="label">Saldo Akhir</div>
+        <div class="value" id="sumSaldoAkhir">Rp 0</div>
+      </div>
+    </div>
+    <div id="adminSaldoBox" style="display:none;margin-top:12px;">
+      <div class="field-row">
+        <div class="field">
+          <label>Ubah Saldo Awal (Admin)</label>
+          <input type="number" id="editSaldoAwal" placeholder="1000000">
+        </div>
+      </div>
+      <button class="btn btn-secondary" onclick="saveSaldoAwal()">Simpan Saldo Awal</button>
+      <p style="font-size:11px;color:var(--muted);margin-top:6px;">Gunakan ini saat top-up / reset saldo petty cash (mis. awal periode baru).</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">➕ Input Penggunaan Petty Cash</div>
+    <div class="field">
+      <label>Tanggal</label>
+      <input type="date" id="pcDate">
+    </div>
+    <div class="field">
+      <label>Kategori</label>
+      <input type="text" id="pcCategory" placeholder="cth: ATK, Transport, Konsumsi">
+    </div>
+    <div class="field">
+      <label>Deskripsi</label>
+      <input type="text" id="pcDescription" placeholder="cth: Beli spidol & kertas">
+    </div>
+    <div class="field">
+      <label>Amount</label>
+      <input type="number" id="pcAmount" placeholder="0">
+    </div>
+    <div class="field">
+      <label>Foto Barang/Struk (boleh lebih dari 1, opsional)</label>
+      <input id="pcPhotoInput" type="file" accept="image/*" capture="environment" style="display:none;">
+      <input id="pcPhotoInputGallery" type="file" accept="image/*" style="display:none;">
+      <div style="display:flex;gap:8px;">
+        <button type="button" id="pcTakePhotoBtn" class="btn btn-secondary" style="flex:1;">📷 Ambil Foto</button>
+        <button type="button" id="pcPickGalleryBtn" class="btn btn-secondary" style="flex:1;">🖼️ Dari Galeri</button>
+      </div>
+      <div id="pcPhotoThumbs" style="display:none;flex-wrap:wrap;gap:10px;margin-top:8px;"></div>
+      <button type="button" id="pcRemovePhotoBtn" class="btn btn-ghost" style="margin-top:6px;">Hapus Semua Foto</button>
+    </div>
+    <input type="hidden" id="pcEditId">
+    <button class="btn btn-primary" id="pcSaveBtn" onclick="saveUsage()">💾 Simpan Penggunaan</button>
+    <button class="btn btn-ghost" id="pcCancelEditBtn" style="display:none;" onclick="cancelEdit()">Batal Edit</button>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Riwayat Penggunaan</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal</label>
+        <input type="date" id="histFrom">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal</label>
+        <input type="date" id="histTo">
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="loadHistory()">🔍 Tampilkan Riwayat</button>
+    <div style="font-size:13px;font-weight:700;margin-top:10px;" id="histTotalLine"></div>
+    <div class="table-wrap pc-hist-table-wrap" style="margin-top:10px;">
+      <table>
+        <thead><tr><th style="width:32px;"><input type="checkbox" id="histSelectAll" onchange="toggleSelectAllHistory(this)" title="Pilih semua"></th><th>Tanggal</th><th>Kategori</th><th>Deskripsi</th><th class="num">Amount</th><th></th><th></th></tr></thead>
+        <tbody id="histBody"></tbody>
+      </table>
+    </div>
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn btn-secondary" id="exportBtn" onclick="exportExcel()">⬇ Export ke Excel</button>
+      <button class="btn btn-primary" id="reimburseBtn" onclick="reimburseSelected()" disabled>🔁 Reimburse Terpilih</button>
+      <button class="btn btn-ghost" id="deleteSelectedBtn" onclick="deleteSelectedUsage()" disabled style="color:#C23B2E;">🗑 Hapus Terpilih</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">🔁 Reimburse</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Transaksi yang sudah di-reimburse tidak lagi mengurangi Saldo Petty Cash.</p>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal Reimburse</label>
+        <input type="date" id="reimbFrom">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal Reimburse</label>
+        <input type="date" id="reimbTo">
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="loadReimburse()">🔍 Tampilkan Riwayat Reimburse</button>
+    <div style="font-size:13px;font-weight:700;margin-top:10px;" id="reimbTotalLine"></div>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="exportReimburse()">⬇ Export Reimburse ke Excel</button>
+    <div class="table-wrap pc-reimb-table-wrap" style="margin-top:10px;">
+      <table>
+        <thead><tr><th style="width:32px;"><input type="checkbox" id="reimbSelectAll" onchange="toggleAllReimburseCheck(this)"></th><th>Tgl Transaksi</th><th>Tgl Reimburse</th><th>Kategori</th><th>Deskripsi</th><th class="num">Amount</th><th></th></tr></thead>
+        <tbody id="reimbBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../../shared/xlsx.full.min.js"></script>
+<script src="../../shared/local-db.js?v=1"></script>
+<script src="../../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 2;</script>
+<script src="../../shared/auth-guard.js?v=46"></script>
+<script src="../../shared/ui-dialog.js?v=41"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="app.js?v=7"></script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+[
+{
+"nomor":1,
+"kode":"300246",
+"item":"TEA EARL GREY",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":2,
+"kode":"300247",
+"item":"TEA ENGLISH BREAKFAST",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":3,
+"kode":"300249",
+"item":"TEA PURE CAMOMILE",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":4,
+"kode":"300250",
+"item":"TEA SENCHA",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":5,
+"kode":"300702",
+"item":"ICE TEA F",
+"konv":625,
+"uom":"G"
+},
+{
+"nomor":6,
+"kode":"301123",
+"item":"BLACK TEA L",
+"konv":100,
+"uom":"PC"
+},
+{
+"nomor":7,
+"kode":"301254",
+"item":"ITOEN OI OCHA",
+"konv":1,
+"uom":"BT"
+},
+{
+"nomor":8,
+"kode":"301255",
+"item":"ITOEN JASMINE GREEN",
+"konv":1,
+"uom":"BT"
+},
+{
+"nomor":9,
+"kode":"301443",
+"item":"PEACH HALVES IN LIGHT",
+"konv":460,
+"uom":"G"
+},
+{
+"nomor":10,
+"kode":"301449",
+"item":"AIR MINUM PH TINGGI SNI",
+"konv":1,
+"uom":"BT"
+},
+{
+"nomor":11,
+"kode":"301589",
+"item":"MARJAN SYRUP COCOPANDAN",
+"konv":460,
+"uom":"ML"
+},
+{
+"nomor":12,
+"kode":"301627",
+"item":"PEACH JUICE BEVERAGE CONCENTRATE",
+"konv":1200,
+"uom":"G"
+},
+{
+"nomor":13,
+"kode":"301663",
+"item":"SAGO MUTIARA DRY",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":14,
+"kode":"301665",
+"item":"CINCAU HITAM",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":15,
+"kode":"301666",
+"item":"FRESH FRUIT AVOCADO",
+"konv":1,
+"uom":"G"
+},
+{
+"nomor":16,
+"kode":"301667",
+"item":"HONEY ALSHIFA",
+"konv":250,
+"uom":"G"
+},
+{
+"nomor":17,
+"kode":"301681",
+"item":"CENDOL DAUN SUJI",
+"konv":1000,
+"uom":"G"
+},
+{
+"nomor":18,
+"kode":"400936",
+"item":"CONTAINER PLASTIC SQUARE 1000 ML TAKE AW",
+"konv":23,
+"uom":"PC"
+},
+{
+"nomor":19,
+"kode":"401033",
+"item":"CONTAINER PLASTIC ROUND 300 ML TAKE AWAY",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":20,
+"kode":"401693",
+"item":"A SPUNBOND BAG 2 SISI",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":21,
+"kode":"401698",
+"item":"A PAPER BOX",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":22,
+"kode":"401699",
+"item":"A PAPER CUP 12 OZ",
+"konv":25,
+"uom":"PC"
+},
+{
+"nomor":23,
+"kode":"401700",
+"item":"A PLASTIC CUP 12 OZ",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":24,
+"kode":"401701",
+"item":"A PLASTIC CUP 18 OZ",
+"konv":50,
+"uom":"PC"
+},
+{
+"nomor":25,
+"kode":"401926",
+"item":"A SAUCE CUP 35ML",
+"konv":50,
+"uom":"PC"
+}
+]

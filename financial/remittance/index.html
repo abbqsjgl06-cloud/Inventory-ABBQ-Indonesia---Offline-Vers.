@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>Remittance of Fund — Financial ABBQ</title>
+<link rel="icon" href="../../logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../shared/inv-style.css?v=42">
+<style>
+  :root{ --accent:#0D7A5F; --accent-tint:#E2F5EF; }
+  thead th{background:var(--accent-tint);}
+  .rf-total{
+    display:flex;justify-content:space-between;align-items:center;
+    background:#FBEBC7;border-radius:10px;padding:12px 14px;margin:10px 0 4px;
+    font-weight:800;font-size:15px;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back-btn" href="../index.html">←</a>
+  <div class="topbar-title">
+    <div class="topbar-eyebrow">Financial</div>
+    <div class="topbar-h1">Remittance of Fund</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel">
+    <div class="field">
+      <label>Tanggal</label>
+      <input type="date" id="rfDate" onchange="loadForDate()">
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">🧑‍💼 PIC</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Prepared By</label>
+        <input type="text" id="preparedBy" placeholder="Nama yang menyiapkan">
+      </div>
+      <div class="field">
+        <label>Acknowledge By</label>
+        <input type="text" id="acknowledgeBy" placeholder="Nama yang mengetahui">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">💵 Sales Cash</div>
+    <div class="field">
+      <label>Aktual Sales Cash</label>
+      <input type="number" id="salesCashActual" value="0" oninput="recalc()">
+    </div>
+    <div class="field">
+      <label>Petty Cash (reimbursement, boleh 0)</label>
+      <input type="number" id="pettyCash" value="0" oninput="recalc()">
+    </div>
+    <div class="rf-total">
+      <span>Bank In Sales</span>
+      <span id="bankInSales">0</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">💳 Cashless</div>
+    <div class="field">
+      <label>BRI</label>
+      <div style="display:flex;gap:8px;align-items:stretch;">
+        <input type="number" id="cl_bri" value="0" oninput="recalc()" style="flex:1;">
+        <button type="button" class="btn btn-secondary" style="width:auto;padding:0 16px;" onclick="openMiniCalculator('cl_bri')">🧮</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Mandiri</label>
+      <div style="display:flex;gap:8px;align-items:stretch;">
+        <input type="number" id="cl_mandiri" value="0" oninput="recalc()" style="flex:1;">
+        <button type="button" class="btn btn-secondary" style="width:auto;padding:0 16px;" onclick="openMiniCalculator('cl_mandiri')">🧮</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>CIMB</label>
+      <div style="display:flex;gap:8px;align-items:stretch;">
+        <input type="number" id="cl_cimb" value="0" oninput="recalc()" style="flex:1;">
+        <button type="button" class="btn btn-secondary" style="width:auto;padding:0 16px;" onclick="openMiniCalculator('cl_cimb')">🧮</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Delivery</label>
+      <div style="display:flex;gap:8px;align-items:stretch;">
+        <input type="number" id="cl_delivery" value="0" oninput="recalc()" style="flex:1;">
+        <button type="button" class="btn btn-secondary" style="width:auto;padding:0 16px;" onclick="openMiniCalculator('cl_delivery')">🧮</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Grab</label>
+      <div style="display:flex;gap:8px;align-items:stretch;">
+        <input type="number" id="cl_grab" value="0" oninput="recalc()" style="flex:1;">
+        <button type="button" class="btn btn-secondary" style="width:auto;padding:0 16px;" onclick="openMiniCalculator('cl_grab')">🧮</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Transfer SX</label>
+      <div style="display:flex;gap:8px;align-items:stretch;">
+        <input type="number" id="cl_transfersx" value="0" oninput="recalc()" style="flex:1;">
+        <button type="button" class="btn btn-secondary" style="width:auto;padding:0 16px;" onclick="openMiniCalculator('cl_transfersx')">🧮</button>
+      </div>
+    </div>
+
+    <div class="rf-total">
+      <span>Total Bank In Sales</span>
+      <span id="totalBankInSales">0</span>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" onclick="saveRemittance()">💾 Simpan Remittance of Fund</button>
+
+  <div class="panel" style="margin-top:20px;">
+    <div class="panel-title">Riwayat</div>
+    <div class="field-row">
+      <div class="field">
+        <label>Dari Tanggal</label>
+        <input type="date" id="histFrom">
+      </div>
+      <div class="field">
+        <label>Sampai Tanggal</label>
+        <input type="date" id="histTo">
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="loadHistory()">🔍 Tampilkan Riwayat</button>
+    <div class="table-wrap" style="margin-top:14px;">
+      <table>
+        <thead><tr><th>Tanggal</th><th class="num">Bank In Sales</th><th class="num">Cashless</th><th class="num">Total Bank In</th><th></th></tr></thead>
+        <tbody id="histBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<div class="notif" id="notif"></div>
+
+<script src="../../shared/local-db.js?v=1"></script>
+<script src="../../shared/local-auth.js?v=1"></script>
+<script>window.AUTH_GUARD_DEPTH = 2;</script>
+<script src="../../shared/auth-guard.js?v=46"></script>
+<script src="../../shared/ui-dialog.js?v=41"></script>
+<script src="../../shared/mini-calculator.js?v=1"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>
