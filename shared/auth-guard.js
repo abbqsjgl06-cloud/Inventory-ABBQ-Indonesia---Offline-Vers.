@@ -1,19 +1,15 @@
 /* ==========================================
-   ABBQ Inventory - Auth Guard (OFFLINE edition)
+   ABBQ Inventory - Auth Guard (OFFLINE edition, TANPA layar login)
    shared/auth-guard.js
 
+   Aplikasi ini murni offline / 1 perangkat, jadi TIDAK ADA lagi
+   halaman login - saat halaman dibuka, script ini langsung membuat
+   sesi "Super Admin" (sjgl) otomatis dan menampilkan konten.
+
    Include ini dekat atas <body> (setelah shared/local-db.js dan
-   shared/local-auth.js) di setiap halaman yang butuh login. Ia
-   menyembunyikan konten halaman sampai LocalAuth memastikan ada sesi
-   login, kalau tidak, redirect ke halaman login pusat.
-
-   Sebelum include script ini, set:
-     window.AUTH_GUARD_DEPTH = <jumlah folder dari root proyek>
-   contoh: index.html root -> 0, stock-opname/input.html -> 1
-
-   Setelah lolos, window.CURRENT_ROLE diisi "admin" (Super Admin -
-   satu-satunya akun di mode offline ini) dan event "authReady"
-   ditembakkan di document.
+   shared/local-auth.js). Setelah selesai, window.CURRENT_ROLE diisi
+   "admin" dan event "authReady" ditembakkan di document - modul lain
+   (app.js tiap halaman) menunggu event ini sebelum mengambil data.
 ========================================== */
 
 "use strict";
@@ -32,37 +28,24 @@ window.AUTH_READY_PROMISE = new Promise(function (resolve) {
     _authReadyResolve = resolve;
 });
 
-function _authGuardLoginPath() {
-    var depth = window.AUTH_GUARD_DEPTH || 0;
-    var prefix = "";
-    for (var i = 0; i < depth; i++) prefix += "../";
-    return prefix + "login.html";
-}
-
 document.addEventListener("DOMContentLoaded", function () {
-    var user = window.LocalAuth ? window.LocalAuth.currentUser() : null;
-
-    if (!user) {
-        var loginUrl = _authGuardLoginPath() + "?redirect=" + encodeURIComponent(window.location.pathname + window.location.search);
-        window.location.href = loginUrl;
-        return;
-    }
+    var user = window.LocalAuth ? (window.LocalAuth.currentUser() || window.LocalAuth.autoLogin()) : null;
 
     // Mode offline: hanya 1 akun (Super Admin), tanpa scoping outlet.
-    window.CURRENT_USER_EMAIL = user.username;
+    window.CURRENT_USER_EMAIL = user ? user.username : "sjgl";
     window.CURRENT_ROLE = "admin";
     window.CURRENT_OUTLET_ID = null;
 
     var hideStyle = document.getElementById("auth-guard-hide");
     if (hideStyle) hideStyle.remove();
 
-    _authReadyResolve({ role: "admin", email: user.username, outletId: null });
-    _injectUserBadge(user);
+    _authReadyResolve({ role: "admin", email: window.CURRENT_USER_EMAIL, outletId: null });
+    _injectUserBadge(user || { username: "sjgl", roleLabel: "Super Admin" });
     _reserveTopChromeSpace();
     setTimeout(_reserveTopChromeSpace, 400); // jaga-jaga kalau webfont/layout baru settle belakangan
 
     document.dispatchEvent(new CustomEvent("authReady", {
-        detail: { role: "admin", email: user.username, outletId: null }
+        detail: { role: "admin", email: window.CURRENT_USER_EMAIL, outletId: null }
     }));
 });
 
@@ -161,6 +144,9 @@ function _injectUserBadge(user) {
 }
 
 async function authGuardLogout() {
+    // Mode offline tanpa layar login lagi - "Logout" sekarang hanya
+    // menghapus sesi tersimpan lalu langsung buat sesi baru otomatis
+    // (karena cuma ada 1 akun, efeknya cuma reset tampilan).
     await window.LocalAuth.signOut();
-    window.location.href = _authGuardLoginPath();
+    window.location.reload();
 }

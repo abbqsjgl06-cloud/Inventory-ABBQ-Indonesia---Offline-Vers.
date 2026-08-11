@@ -15,7 +15,7 @@
    setSetting) - HANYA di perangkat ini, tidak dikirim kemana-mana.
 
    Harus dimuat SETELAH shared/local-db.js (butuh InvDB) dan SEBELUM
-   shared/auth-guard.js / login.js.
+   shared/auth-guard.js.
 ========================================== */
 
 "use strict";
@@ -90,6 +90,21 @@ const LocalAuth = (() => {
         listeners.forEach(cb => { try { cb(null); } catch (e) { /* ignore */ } });
     }
 
+    // Login otomatis tanpa perlu isi username/password - dipakai karena
+    // aplikasi ini murni offline/1 perangkat, jadi layar login dihilangkan
+    // dan pengguna langsung masuk sebagai Super Admin.
+    function autoLogin() {
+        if (currentSession) return currentSession;
+        currentSession = {
+            username: USERNAME,
+            role: ROLE,
+            roleLabel: ROLE_LABEL,
+            loginAt: Date.now()
+        };
+        try { localStorage.setItem(SESSION_KEY, JSON.stringify(currentSession)); } catch (e) { /* ignore */ }
+        return currentSession;
+    }
+
     async function changePassword(oldPassword, newPassword) {
         const storedPass = await _getStoredPassword();
         if (String(oldPassword || "") !== storedPass) {
@@ -103,7 +118,7 @@ const LocalAuth = (() => {
 
     return {
         USERNAME, ROLE, ROLE_LABEL,
-        signIn, signOut, currentUser, onAuthStateChanged, changePassword
+        signIn, signOut, autoLogin, currentUser, onAuthStateChanged, changePassword
     };
 
 })();
