@@ -117,6 +117,7 @@ function renderOpeningMode(){
         const [y,m,d] = OPENING_DATA.date.split("-");
         document.getElementById("openingAutoDate").textContent = `${d}/${m}/${y}`;
         document.getElementById("openingAutoCount").textContent = Object.keys(OPENING_DATA.byCode).length;
+        document.getElementById("openingAutoSessions").innerHTML = sessionBadgeList(OPENING_DATA.sessions);
     } else {
         autoBox.style.display = OPENING_DATA ? "block" : "none";
         manualBox.style.display = "block";
@@ -156,11 +157,26 @@ function renderEndingMode(){
         const [y,m,d] = ENDING_DATA.date.split("-");
         document.getElementById("endingAutoDate").textContent = `${d}/${m}/${y}`;
         document.getElementById("endingAutoCount").textContent = Object.keys(ENDING_DATA.byCode).length;
+        document.getElementById("endingAutoSessions").innerHTML = sessionBadgeList(ENDING_DATA.sessions);
     } else {
         autoBox.style.display = ENDING_DATA ? "block" : "none";
         manualBox.style.display = "block";
         backBtn.style.display = ENDING_DATA ? "inline-flex" : "none";
     }
+}
+
+// Daftar kategori/type sesi yang benar-benar ke-hitung utk sebuah
+// tanggal. INI PENTING supaya kalau cuma "Kitchen - Daily" yang
+// disubmit hari itu (misalnya "Frontliner" lupa diisi), user LANGSUNG
+// lihat itemnya cuma dari 1 kategori - bukan baru sadar setelah lihat
+// banyak item "Ending Stock = 0" yang janggal di hasil variance.
+const ALL_EXPECTED_SESSIONS = ["Kitchen · Daily", "Frontliner · Daily", "Kitchen · WM", "Frontliner · WM"];
+function sessionBadgeList(sessions){
+    const present = new Set((sessions || []).map(s => `${s.kategori || "-"} · ${s.type || "-"}`));
+    return `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+        ${Array.from(present).map(label => `<span style="background:var(--good-tint,#E3F5E8);color:var(--good,#1E7A3D);font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;">✓ ${label}</span>`).join("")}
+        ${ALL_EXPECTED_SESSIONS.filter(l => !present.has(l) && (l.includes("Daily"))).map(label => `<span style="background:#FCEBE9;color:#8C2A1E;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;" title="Tidak ada input untuk kategori ini di tanggal tsb">⚠ ${label} (kosong)</span>`).join("")}
+    </div>`;
 }
 
 function useManualEnding(){
@@ -237,21 +253,47 @@ async function refreshUsageAutoList(){
 
     if(!periodStart || !periodEnd){ box.innerHTML = "-"; return; }
 
-    const overlapping = USAGE_IMPORTS.filter(u =>
+    box.innerHTML = `<span style="color:var(--muted);">Memeriksa data usage...</span>`;
+
+    let dailyRows = [];
+    try {
+        dailyRows = await InvDB.getByDateRange("usageDailyMaterial", periodStart, periodEnd, "date");
+    } catch(err){
+        console.warn("Gagal memuat usageDailyMaterial:", err);
+    }
+
+    const importIdsWithDailyData = new Set(dailyRows.map(d => d.importId));
+    const overlappingImports = USAGE_IMPORTS.filter(u =>
         u.periodStart && u.periodEnd && u.periodStart <= periodEnd && u.periodEnd >= periodStart
     );
+    const legacyImports = overlappingImports.filter(u => !importIdsWithDailyData.has(u.id));
 
-    if(overlapping.length === 0){
-        box.innerHTML = `<span style="color:#8C2A1E;">⚠ Tidak ada data usage yang mencakup periode ini. Upload dulu di modul Import Usage bila diperlukan.</span>`;
+    if(dailyRows.length === 0 && legacyImports.length === 0){
+        box.innerHTML = `<span style="color:#8C2A1E;">⚠ Tidak ada data usage pada tanggal ${periodStart} s/d ${periodEnd}. Upload dulu di modul Import Usage bila diperlukan.</span>`;
         return;
     }
 
-    box.innerHTML = overlapping.map(u => `
+    const totalQty = dailyRows.reduce((sum, d) => sum + Number(d.qty || 0), 0);
+    const uniqueMaterials = new Set(dailyRows.map(d => d.material_code)).size;
+    const datesCovered = new Set(dailyRows.map(d => d.date));
+
+    let html = "";
+    if(dailyRows.length > 0){
+        html += `
         <div style="padding:8px 0;border-bottom:1px solid var(--line);">
-            <b>${u.periodLabel}</b>
-            <br><small style="color:var(--muted);">${u.filename} · ${u.periodStart} s/d ${u.periodEnd}</small>
-        </div>
-    `).join("");
+            <b style="color:var(--good);">✓ Usage presisi ${periodStart} s/d ${periodEnd}</b>
+            <br><small style="color:var(--muted);">${uniqueMaterials} bahan baku · ${datesCovered.size} tanggal ada data · total qty ${fmt(totalQty)}</small>
+        </div>`;
+    }
+    if(legacyImports.length > 0){
+        html += `
+        <div style="padding:8px 0;border-bottom:1px solid var(--line);">
+            <b style="color:#8A6D00;">⚠ ${legacyImports.length} file usage lama ikut dihitung PENUH (bukan per-tanggal)</b>
+            <br><small style="color:var(--muted);">File ini tidak punya rincian tanggal per baris (kolom tanggal tidak kebaca saat upload), jadi seluruh isi file dihitung sebagai usage periode ini - bisa kurang presisi kalau file-nya mencakup lebih dari periode yang sedang dianalisa:</small>
+            ${legacyImports.map(u => `<div style="padding:4px 0 0 10px;"><small style="color:var(--muted);">• <b>${u.periodLabel}</b> · ${u.filename} (${u.periodStart} s/d ${u.periodEnd})</small></div>`).join("")}
+        </div>`;
+    }
+    box.innerHTML = html;
 }
 
 /* ================= CALCULATION ================= */
@@ -262,6 +304,28 @@ async function calculateVariance(){
 
     if(!periodStart || !periodEnd){ toast("Lengkapi periode tanggal","error"); return; }
 
+    const calcBtn = document.getElementById("calcVarianceBtn");
+    const originalBtnText = calcBtn ? calcBtn.textContent : "";
+    if(calcBtn){ calcBtn.disabled = true; calcBtn.textContent = "Menghitung..."; }
+
+    try {
+        await _calculateVarianceInner(periodStart, periodEnd);
+    } catch(err){
+        // SEBELUMNYA: kalau ada error di tengah proses (mis. query
+        // gagal, izin Firestore, koneksi putus), function ini berhenti
+        // diam-diam tanpa pesan apapun ke layar - tombol "Hitung
+        // Variance" jadi kelihatan seperti tidak merespon padahal
+        // sebenarnya ada error yang cuma tercatat di console browser
+        // (tidak kelihatan oleh user). Sekarang errornya ditampilkan
+        // jelas lewat toast, supaya ketahuan penyebabnya.
+        console.error("Gagal menghitung variance:", err);
+        toast("Gagal menghitung variance: " + (err.message || err), "error");
+    } finally {
+        if(calcBtn){ calcBtn.disabled = false; calcBtn.textContent = originalBtnText; }
+    }
+}
+
+async function _calculateVarianceInner(periodStart, periodEnd){
     let opening;
     if(OPENING_MODE === "auto" && OPENING_DATA){
         opening = { ...OPENING_DATA.byCode };
@@ -297,15 +361,38 @@ async function calculateVariance(){
     const wasteInRange = wasteRecords.filter(r => r.date >= periodStart && r.date <= periodEnd);
     const waste = sumByCode(wasteInRange);
 
-    // 5. Usage - auto-include all imports overlapping the period
+    // 5. Usage - pakai "usageDailyMaterial" (breakdown PER TANGGAL per
+    // bahan baku), difilter TEPAT ke periodStart..periodEnd.
+    // SEBELUMNYA: usage diambil dari total "usageDetail" per FILE IMPORT
+    // (bukan per tanggal) - jadi kalau file yang diupload mencakup
+    // rentang lebih lebar dari periode variance yang sedang dihitung
+    // (mis. file 3 hari, tapi variance yang dihitung cuma 1 hari), usage
+    // yang ikut kehitung jadi usage 3 hari penuh, bukan cuma 1 hari -
+    // itu penyebab kolom Usage & Variance sering meleset besar.
+    const dailyMaterialRows = await InvDB.getByDateRange("usageDailyMaterial", periodStart, periodEnd, "date");
+    let usage = {};
+    dailyMaterialRows.forEach(d => {
+        usage[d.material_code] = (usage[d.material_code] || 0) + Number(d.qty || 0);
+    });
+
+    // FALLBACK: import LAMA (sebelum fitur breakdown-per-tanggal ada)
+    // atau file yang kolom tanggalnya tidak kebaca saat upload TIDAK
+    // PUNYA baris di usageDailyMaterial sama sekali - kalau dibiarkan,
+    // usage-nya seolah "hilang" total (0) padahal datanya sebenarnya
+    // ada, cuma tidak presisi per-tanggal. Untuk import semacam itu
+    // SAJA (yang periodenya tumpang tindih dengan periode ini, dan
+    // benar-benar tidak py punya baris harian), tetap pakai total
+    // seluruh file sebagai fallback - sama seperti perilaku lama -
+    // supaya datanya tidak hilang, hanya kurang presisi.
+    const importIdsWithDailyData = new Set(dailyMaterialRows.map(d => d.importId));
     const overlappingImports = USAGE_IMPORTS.filter(u =>
         u.periodStart && u.periodEnd && u.periodStart <= periodEnd && u.periodEnd >= periodStart
     );
-    let usage = {};
-    for(const imp of overlappingImports){
+    const legacyImports = overlappingImports.filter(u => !importIdsWithDailyData.has(u.id));
+    for(const imp of legacyImports){
         const details = await InvDB.getByIndex("usageDetail", "importId", imp.id);
         details.forEach(d => {
-            usage[d.material_code] = (usage[d.material_code] || 0) + d.qty;
+            usage[d.material_code] = (usage[d.material_code] || 0) + Number(d.qty || 0);
         });
     }
 
@@ -369,7 +456,45 @@ function sumByCode(rows){
     return result;
 }
 
-/* ================= TABLE RENDER ================= */
+/* ================= TABLE RENDER & SORT ================= */
+
+let SORT_COL = null;   // null = pakai urutan default (variance terbesar dulu)
+let SORT_DIR = 1;      // 1 = ascending / A-Z, -1 = descending / Z-A
+
+document.addEventListener("DOMContentLoaded", () => {
+    const headerRow = document.getElementById("resultHeaderRow");
+    if(headerRow){
+        headerRow.querySelectorAll("th[data-col]").forEach(th => {
+            th.addEventListener("click", () => sortByColumn(th.dataset.col, th.dataset.type));
+        });
+    }
+});
+
+function sortByColumn(col, type){
+    if(SORT_COL === col){
+        SORT_DIR = -SORT_DIR; // klik lagi di kolom yang sama = balik arah
+    } else {
+        SORT_COL = col;
+        SORT_DIR = (type === "text") ? 1 : -1; // teks default A-Z, angka default besar->kecil (lebih relevan utk variance dkk)
+    }
+    updateSortHeaderUI();
+    renderTable();
+}
+
+function updateSortHeaderUI(){
+    document.querySelectorAll("#resultHeaderRow th[data-col]").forEach(th => {
+        const arrow = th.querySelector(".sort-arrow");
+        if(arrow) arrow.remove();
+        th.classList.remove("sort-active");
+        if(th.dataset.col === SORT_COL){
+            th.classList.add("sort-active");
+            const span = document.createElement("span");
+            span.className = "sort-arrow";
+            span.textContent = SORT_DIR === 1 ? "▲" : "▼";
+            th.appendChild(span);
+        }
+    });
+}
 
 function setFilter(f){
     CURRENT_FILTER = f;
@@ -387,6 +512,16 @@ function renderTable(){
 
     if(CURRENT_FILTER === "variance"){
         rows = rows.filter(r => Math.abs(r.variance) > 0.001);
+    }
+
+    if(SORT_COL){
+        rows = [...rows].sort((a, b) => {
+            const va = a[SORT_COL], vb = b[SORT_COL];
+            if(typeof va === "string"){
+                return va.localeCompare(vb, "id") * SORT_DIR;
+            }
+            return (va - vb) * SORT_DIR;
+        });
     }
 
     if(rows.length === 0){

@@ -199,7 +199,9 @@ function toggleShowAll(){
 }
 
 let LAST_REPORT_DATA = null; // dipakai exportExcel() & summary
-let SUMMARY_VISIBLE = false;
+let SUMMARY_VISIBLE = true;   // ringkasan tampil duluan secara default
+let DETAIL_VISIBLE = false;   // breakdown per tanggal & per jam - HANYA muncul kalau diminta, tidak digabung otomatis lagi
+let COMPARE_VISIBLE = false;
 
 async function generateReport(){
     const showAll = document.getElementById("showAll").checked;
@@ -227,11 +229,19 @@ async function generateReport(){
     }
 
     const filtered = showAll ? all : all.filter(d => d.date >= from && d.date <= to);
+    const byDate = aggregateByDate(filtered);
 
-    // Gabungkan per tanggal (kalau "Semua Outlet" aktif, beberapa
-    // dokumen outlet berbeda bisa punya tanggal yang sama - dijumlah).
+    const dates = [...byDate.keys()].sort();
+    LAST_REPORT_DATA = { dates, byDate, from, to, showAll };
+    renderAllViews();
+}
+
+// Gabungkan sekumpulan dokumen "hourlySales" jadi Map<tanggal, Map<jam, {sales, qty}>>
+// (kalau "Semua Outlet" aktif, beberapa dokumen outlet berbeda bisa
+// punya tanggal yang sama - dijumlah).
+function aggregateByDate(docs){
     const byDate = new Map();
-    filtered.forEach(doc => {
+    docs.forEach(doc => {
         if(!byDate.has(doc.date)) byDate.set(doc.date, new Map());
         const hourMap = byDate.get(doc.date);
         (doc.hours || []).forEach(h => {
@@ -241,24 +251,62 @@ async function generateReport(){
             hourMap.set(h.hour, cur);
         });
     });
+    return byDate;
+}
 
-    const dates = [...byDate.keys()].sort();
-    LAST_REPORT_DATA = { dates, byDate };
-    renderReport(dates, byDate);
+function dateTotal(hourMap){
+    let sales = 0, qty = 0;
+    (hourMap || new Map()).forEach(v => { sales += v.sales; qty += v.qty; });
+    return { sales, qty };
+}
+
+// Render ulang semua bagian yang sedang toggle ON, dan sembunyikan
+// (kosongkan) bagian yang sedang OFF - supaya tidak digabung semua
+// sekaligus seperti sebelumnya. Dipanggil tiap kali data baru dimuat
+// (generateReport) maupun tiap kali sebuah toggle diaktifkan.
+function renderAllViews(){
+    if(!LAST_REPORT_DATA){
+        ["summaryArea","compareArea","reportArea"].forEach(id => document.getElementById(id).innerHTML = "");
+        return;
+    }
+    const { dates, byDate } = LAST_REPORT_DATA;
+
     if(SUMMARY_VISIBLE) renderSummary(dates, byDate);
+    else document.getElementById("summaryArea").innerHTML = "";
+
+    if(DETAIL_VISIBLE) renderReport(dates, byDate);
+    else document.getElementById("reportArea").innerHTML = "";
+
+    if(COMPARE_VISIBLE) renderComparation();
+    else document.getElementById("compareArea").innerHTML = "";
 }
 
 function toggleSummary(){
     SUMMARY_VISIBLE = !SUMMARY_VISIBLE;
     const btn = document.getElementById("summaryToggleBtn");
-    if(SUMMARY_VISIBLE){
-        btn.textContent = "📊 Sembunyikan Ringkasan";
-        if(LAST_REPORT_DATA) renderSummary(LAST_REPORT_DATA.dates, LAST_REPORT_DATA.byDate);
-        else toast("Tekan \"Tampilkan\" dulu untuk memuat data", "error");
-    } else {
-        btn.textContent = "📊 Ringkasan per Tanggal";
-        document.getElementById("summaryArea").innerHTML = "";
+    btn.textContent = SUMMARY_VISIBLE ? "📊 Sembunyikan Ringkasan" : "📊 Ringkasan per Tanggal";
+    if(!LAST_REPORT_DATA){ if(SUMMARY_VISIBLE) toast("Tekan \"Tampilkan\" dulu untuk memuat data", "error"); return; }
+    renderAllViews();
+}
+
+function toggleDetail(){
+    DETAIL_VISIBLE = !DETAIL_VISIBLE;
+    const btn = document.getElementById("detailToggleBtn");
+    btn.textContent = DETAIL_VISIBLE ? "📋 Sembunyikan Detail per Jam" : "📋 Detail per Jam";
+    if(!LAST_REPORT_DATA){ if(DETAIL_VISIBLE) toast("Tekan \"Tampilkan\" dulu untuk memuat data", "error"); return; }
+    renderAllViews();
+}
+
+function toggleComparation(){
+    if(!COMPARE_VISIBLE && LAST_REPORT_DATA && LAST_REPORT_DATA.showAll){
+        toast("Matikan dulu \"Tampilkan semua tanggal\" dan isi rentang tanggal spesifik untuk pakai Comparation.", "error");
+        return;
     }
+    COMPARE_VISIBLE = !COMPARE_VISIBLE;
+    const btn = document.getElementById("compareToggleBtn");
+    btn.textContent = COMPARE_VISIBLE ? "📈 Sembunyikan Comparation" : "📈 Comparation";
+    if(!LAST_REPORT_DATA){ if(COMPARE_VISIBLE) toast("Tekan \"Tampilkan\" dulu untuk memuat data", "error"); return; }
+    renderAllViews();
 }
 
 // Rekap 1 baris per tanggal (Sales/CC/Avg dijumlah dari semua jam di
@@ -333,6 +381,142 @@ function renderSummary(dates, byDate){
             </div>
         </div>
     `;
+}
+
+/* ==========================================
+   COMPARATION
+   Bandingkan total Sales & CC pada rentang tanggal yang sedang
+   difilter, terhadap rentang tanggal YANG SAMA (posisi hari ke-1,
+   ke-2, dst) di bulan sebelumnya. Comps % = (periode ini - periode
+   lalu) / periode lalu.
+========================================== */
+
+// Mundurkan tanggal 1 bulan, tetap di tanggal yang sama (kalau tanggal
+// itu tidak ada di bulan sebelumnya, JS Date otomatis "meluber" ke
+// awal bulan berikutnya - kasus langka, cukup jarang kejadian untuk
+// laporan harian toko).
+function dateMinusOneMonth(dateStr){
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const dt = new Date(y, m - 2, d);
+    return toLocalDateStr(dt);
+}
+
+function addDays(dateStr, n){
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const dt = new Date(y, m - 1, d + n);
+    return toLocalDateStr(dt);
+}
+
+function daysBetween(fromStr, toStr){
+    const [y1, m1, d1] = fromStr.split("-").map(Number);
+    const [y2, m2, d2] = toStr.split("-").map(Number);
+    const ms = new Date(y2, m2 - 1, d2) - new Date(y1, m1 - 1, d1);
+    return Math.round(ms / 86400000);
+}
+
+function compsPct(cur, prev){
+    if(prev === 0) return cur === 0 ? 0 : null; // null = N/A (tidak ada pembanding)
+    return ((cur - prev) / prev) * 100;
+}
+
+function fmtComps(pct){
+    if(pct === null) return `<span>N/A</span>`;
+    const cls = pct > 0 ? "comps-pos" : (pct < 0 ? "comps-neg" : "");
+    const sign = pct > 0 ? "+" : "";
+    return `<span class="${cls}">${sign}${pct.toFixed(1)}%</span>`;
+}
+
+async function renderComparation(){
+    const area = document.getElementById("compareArea");
+    const { from, to, byDate: byDateCur } = LAST_REPORT_DATA;
+
+    if(!from || !to){
+        area.innerHTML = `<div class="panel"><p class="empty" style="margin:0;">Isi rentang tanggal spesifik dulu (bukan "Tampilkan semua") untuk pakai Comparation.</p></div>`;
+        return;
+    }
+
+    const spanDays = daysBetween(from, to) + 1;
+    const prevFrom = dateMinusOneMonth(from);
+    const prevTo = addDays(prevFrom, spanDays - 1);
+
+    area.innerHTML = `<div class="panel"><p class="empty" style="margin:0;">Memuat data pembanding...</p></div>`;
+
+    let prevDocs;
+    try {
+        prevDocs = await InvDB.getByDateRange("hourlySales", prevFrom, prevTo, "date");
+    } catch(err){
+        console.error(err);
+        area.innerHTML = `<div class="panel"><p class="empty" style="margin:0;">Gagal memuat data pembanding.</p></div>`;
+        return;
+    }
+    const byDatePrev = aggregateByDate(prevDocs);
+
+    const curLabel = fmtRangeLabel(from, to);
+    const prevLabel = fmtRangeLabel(prevFrom, prevTo);
+
+    let totalCurSales = 0, totalCurQty = 0, totalPrevSales = 0, totalPrevQty = 0;
+    let rowsHtml = "";
+    for(let i = 0; i < spanDays; i++){
+        const curDate = addDays(from, i);
+        const prevDate = addDays(prevFrom, i);
+        const cur = dateTotal(byDateCur.get(curDate));
+        const prev = dateTotal(byDatePrev.get(prevDate));
+        totalCurSales += cur.sales; totalCurQty += cur.qty;
+        totalPrevSales += prev.sales; totalPrevQty += prev.qty;
+
+        rowsHtml += `<tr>
+            <td>${i + 1}</td>
+            <td>${curDate.slice(8,10)}/${curDate.slice(5,7)}</td>
+            <td>${cur.sales.toLocaleString("id-ID")}</td>
+            <td>${cur.qty.toLocaleString("id-ID")}</td>
+            <td>${prevDate.slice(8,10)}/${prevDate.slice(5,7)}</td>
+            <td>${prev.sales.toLocaleString("id-ID")}</td>
+            <td>${prev.qty.toLocaleString("id-ID")}</td>
+            <td>${fmtComps(compsPct(cur.sales, prev.sales))}</td>
+            <td>${fmtComps(compsPct(cur.qty, prev.qty))}</td>
+        </tr>`;
+    }
+
+    const totalCompsSales = compsPct(totalCurSales, totalPrevSales);
+    const totalCompsQty = compsPct(totalCurQty, totalPrevQty);
+
+    area.innerHTML = `
+        <div class="panel hs-compare-table">
+            <div class="hs-day-title">📈 Comparation: ${curLabel} vs ${prevLabel}</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr class="group-row">
+                            <th></th><th colspan="3">${curLabel}</th><th colspan="3">${prevLabel}</th><th colspan="2">Comps</th>
+                        </tr>
+                        <tr><th>#</th><th>Tgl</th><th>Sales</th><th>CC</th><th>Tgl</th><th>Sales</th><th>CC</th><th>Sales</th><th>CC</th></tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                        <tr class="total-row">
+                            <td colspan="2">Total</td>
+                            <td>${totalCurSales.toLocaleString("id-ID")}</td>
+                            <td>${totalCurQty.toLocaleString("id-ID")}</td>
+                            <td></td>
+                            <td>${totalPrevSales.toLocaleString("id-ID")}</td>
+                            <td>${totalPrevQty.toLocaleString("id-ID")}</td>
+                            <td>${fmtComps(totalCompsSales)}</td>
+                            <td>${fmtComps(totalCompsQty)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+}
+
+function fmtRangeLabel(from, to){
+    const d1 = new Date(from + "T00:00:00");
+    const d2 = new Date(to + "T00:00:00");
+    if(d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear()){
+        return `${d1.getDate()}-${d2.getDate()} ${BULAN_ID[d1.getMonth()]} ${d1.getFullYear()}`;
+    }
+    return `${d1.getDate()} ${BULAN_ID[d1.getMonth()]} - ${d2.getDate()} ${BULAN_ID[d2.getMonth()]} ${d2.getFullYear()}`;
 }
 
 function renderReport(dates, byDate){

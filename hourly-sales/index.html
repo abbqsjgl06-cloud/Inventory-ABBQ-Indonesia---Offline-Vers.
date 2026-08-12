@@ -18,6 +18,12 @@
   .hs-day-table th:first-child, .hs-day-table td:first-child{width:44px;text-align:center;font-weight:700;}
   .hs-day-table td.num{text-align:right;}
   .hs-day-table tr.total-row td{font-weight:800;background:var(--paper);border-top:2px solid var(--ink);}
+  .hs-compare-table table{table-layout:auto;}
+  .hs-compare-table th, .hs-compare-table td{box-sizing:border-box;font-size:11px;padding:5px 4px;text-align:right;}
+  .hs-compare-table th:first-child, .hs-compare-table td:first-child{text-align:center;font-weight:700;width:34px;}
+  .hs-compare-table thead tr.group-row th{background:var(--accent-tint);font-size:11px;}
+  .hs-compare-table td.comps-pos{color:#1E7A3D;font-weight:700;}
+  .hs-compare-table td.comps-neg{color:#C23B2E;font-weight:700;}
 </style>
 </head>
 <body>
@@ -70,11 +76,16 @@
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button class="btn btn-primary" style="width:auto;flex:1;" onclick="generateReport()">🔍 Tampilkan</button>
       <button class="btn btn-secondary" style="width:auto;flex:1;" onclick="toggleSummary()" id="summaryToggleBtn">📊 Ringkasan per Tanggal</button>
+      <button class="btn btn-secondary" style="width:auto;flex:1;" onclick="toggleComparation()" id="compareToggleBtn">📈 Comparation</button>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+      <button class="btn btn-ghost" style="width:auto;flex:1;" onclick="toggleDetail()" id="detailToggleBtn">📋 Detail per Jam</button>
       <button class="btn btn-secondary" style="width:auto;flex:1;" onclick="exportExcel()">⬇ Export ke Excel</button>
     </div>
   </div>
 
   <div id="summaryArea"></div>
+  <div id="compareArea"></div>
   <div id="reportArea"></div>
 
 </main>
@@ -85,7 +96,7 @@
 <script src="../shared/local-db.js?v=1"></script>
 <script src="../shared/local-auth.js?v=1"></script>
 <script>window.AUTH_GUARD_DEPTH = 1;</script>
-<script src="../shared/auth-guard.js?v=46"></script>
-<script src="app.js?v=2"></script>
+<script src="../shared/auth-guard.js?v=47"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>

@@ -24,58 +24,12 @@
   .stock-badge{font-size:11px;color:var(--muted);}
   .stock-badge.neg{color:#C23B2E;font-weight:700;}
 
-  /* Kolom Item (Kode+Nama+UOM digabung) diberi ruang lebih longgar,
-     boleh turun baris (tidak dipaksa satu baris seperti kolom lain). */
-  .item-row-table td.item-title-cell{white-space:normal;max-width:0;width:38%;}
+  /* Kolom Item (Kode+Nama+UOM digabung) diberi ruang lebih longgar. */
+  .item-row-table td.item-title-cell{white-space:normal;min-width:160px;}
   .item-row-table .item-name-line{font-weight:600;line-height:1.3;}
-
-  /* Di layar sempit (HP), tabel item diubah jadi kartu bertumpuk per
-     baris - tidak ada lagi scroll kiri-kanan, semua kolom kelihatan
-     penuh. Label kolom diambil dari atribut data-label. */
-  @media (max-width:600px){
-    .item-row-table{overflow-x:visible;border:none;}
-    .item-row-table table{min-width:0;}
-    .item-row-table thead{display:none;}
-    .item-row-table tbody tr{
-      display:block;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:10px 12px;
-      margin-bottom:10px;
-      background:var(--card);
-    }
-    .item-row-table tbody tr:hover{background:var(--card);}
-    .item-row-table td{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      white-space:normal;
-      border-top:none;
-      padding:6px 0;
-    }
-    .item-row-table td.item-title-cell{
-      display:block;
-      width:auto;
-      max-width:none;
-      padding:0 0 8px;
-      border-bottom:1px solid var(--line);
-      margin-bottom:6px;
-    }
-    .item-row-table td.num[data-label]::before{
-      content:attr(data-label);
-      font-size:11px;
-      font-weight:700;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.03em;
-      flex:none;
-    }
-    .item-row-table td.num{text-align:right;}
-    .item-row-table td.num .num-value-wrap{margin-left:auto;text-align:right;}
-    .item-row-table td.num .num-value-wrap small{display:block;font-size:10px;}
-    .item-row-table td.num input.qty-input{margin-left:auto;}
-  }
+  .item-row-table th, .item-row-table td{white-space:nowrap;}
+  .item-row-table td.item-title-cell{white-space:normal;}
+  .item-row-table .num-value-wrap small{display:block;font-size:10px;color:var(--muted);}
   .info-box{
     background:#EAF3FF;border:1px solid #BFDBFE;border-radius:12px;
     padding:12px 14px;font-size:12px;color:#1C3D6B;line-height:1.6;margin-bottom:14px;
@@ -211,7 +165,7 @@
 <script src="../shared/local-db.js?v=1"></script>
 <script src="../shared/local-auth.js?v=1"></script>
 <script>window.AUTH_GUARD_DEPTH = 1;</script>
-<script src="../shared/auth-guard.js?v=46"></script>
+<script src="../shared/auth-guard.js?v=47"></script>
 <script src="../shared/xlsx.full.min.js?v=31"></script>
 <script src="../shared/ui-dialog.js?v=41"></script>
 <script src="app.js?v=3"></script>

@@ -10,8 +10,7 @@
 <link rel="stylesheet" href="../shared/inv-style.css?v=42">
 <style>
   :root{ --accent:#B0281C; --accent-tint:#FBE7E4; }
-  thead th{background:var(--accent-tint);}
-  .row-flag{background:#FCEBE9 !important;}
+  .row-flag{background:#FCF3E9 !important;}
   .filter-toggle{
     display:flex;gap:8px;margin-bottom:10px;
   }
@@ -20,6 +19,31 @@
     background:var(--card);font-weight:700;font-size:12px;cursor:pointer;color:var(--muted);
   }
   .filter-toggle button.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+  /* ===== Tabel hasil variance - tampilan lebih rapi & informatif ===== */
+  .table-wrap{
+    border-radius:14px;overflow:hidden;border:1px solid var(--line);
+    box-shadow:0 2px 10px rgba(0,0,0,.04);
+  }
+  .table-wrap table{border-collapse:separate;border-spacing:0;width:100%;}
+  .table-wrap thead th{
+    background:linear-gradient(180deg,#C6392B,var(--accent));
+    color:#fff;text-align:center;text-transform:uppercase;letter-spacing:.02em;
+    font-size:10.5px;font-weight:800;padding:10px 8px;white-space:nowrap;
+    cursor:pointer;user-select:none;position:relative;
+  }
+  .table-wrap thead th:hover{background:linear-gradient(180deg,#D9483A,#C6392B);}
+  .table-wrap thead th .sort-arrow{font-size:9px;opacity:.7;margin-left:3px;}
+  .table-wrap thead th.sort-active{background:linear-gradient(180deg,#8A1F15,#6E1810);}
+  .table-wrap thead th.sort-active .sort-arrow{opacity:1;}
+  .table-wrap tbody td{text-align:center;padding:8px 8px;font-size:12px;}
+  .table-wrap tbody td:nth-child(2){text-align:left;}
+  .table-wrap tbody tr:nth-child(even){background:#FBF9F5;}
+  .table-wrap tbody tr:hover{background:#FDF0EC;}
+  .table-wrap tbody tr.row-flag:hover{background:#FBE3DE;}
+  .table-wrap tbody td.num{font-variant-numeric:tabular-nums;}
+  .table-wrap tbody td.num.pos{color:#1E7A3D;font-weight:700;}
+  .table-wrap tbody td.num.neg{color:#B0281C;font-weight:700;}
 </style>
 </head>
 <body>
@@ -67,11 +91,12 @@
   <div class="panel">
     <div class="panel-title">2. Opening Stock</div>
     <div id="openingAutoBox" style="display:none;">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:4px;">
         ✓ Otomatis terisi dari input Stock Opname terakhir tanggal <b id="openingAutoDate">-</b>
         (<span id="openingAutoCount">0</span> item).
       </p>
-      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px;" onclick="useManualOpening()">Pakai Sesi Stock Opname Manual Sebagai Gantinya</button>
+      <div id="openingAutoSessions"></div>
+      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px;margin-top:10px;" onclick="useManualOpening()">Pakai Sesi Stock Opname Manual Sebagai Gantinya</button>
     </div>
     <div id="openingManualBox">
       <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Tanggal sebelum periode ini belum di-EOD. Pilih 1 atau lebih sesi manual sebagai stok awal periode.</p>
@@ -83,11 +108,12 @@
   <div class="panel">
     <div class="panel-title">3. Ending Stock</div>
     <div id="endingAutoBox" style="display:none;">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:4px;">
         ✓ Otomatis terisi dari input Stock Opname terakhir tanggal <b id="endingAutoDate">-</b>
         (<span id="endingAutoCount">0</span> item).
       </p>
-      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px;" onclick="useManualEnding()">Pakai Sesi Stock Opname Manual Sebagai Gantinya</button>
+      <div id="endingAutoSessions"></div>
+      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px;margin-top:10px;" onclick="useManualEnding()">Pakai Sesi Stock Opname Manual Sebagai Gantinya</button>
     </div>
     <div id="endingManualBox">
       <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Tanggal akhir periode ini belum di-EOD (End of Day). Pilih 1 atau lebih sesi manual sebagai hasil stock opname akhir.</p>
@@ -102,7 +128,7 @@
     <div id="usageAutoList" style="font-size:13px;color:var(--muted);">-</div>
   </div>
 
-  <button class="btn btn-primary" onclick="calculateVariance()" style="margin-bottom:16px;">Hitung Variance</button>
+  <button class="btn btn-primary" id="calcVarianceBtn" onclick="calculateVariance()" style="margin-bottom:16px;">Hitung Variance</button>
 
   <div id="resultSection" style="display:none;">
 
@@ -135,18 +161,20 @@
     <div class="table-wrap">
       <table>
         <thead>
-          <tr>
-            <th>Kode</th><th>Nama Item</th><th>UOM</th>
-            <th class="num">Opening</th>
-            <th class="num">In CK</th>
-            <th class="num">In Supplier</th>
-            <th class="num">Transfer In</th>
-            <th class="num">Transfer Out</th>
-            <th class="num">Waste</th>
-            <th class="num">Usage</th>
-            <th class="num">Expected</th>
-            <th class="num">Ending (SO)</th>
-            <th class="num">Variance</th>
+          <tr id="resultHeaderRow">
+            <th data-col="code" data-type="text">Kode</th>
+            <th data-col="name" data-type="text">Nama Item</th>
+            <th data-col="uom" data-type="text">UOM</th>
+            <th class="num" data-col="opening" data-type="num">Opening</th>
+            <th class="num" data-col="inCK" data-type="num">In CK</th>
+            <th class="num" data-col="inSupplier" data-type="num">In Supplier</th>
+            <th class="num" data-col="transferIn" data-type="num">Transfer In</th>
+            <th class="num" data-col="transferOut" data-type="num">Transfer Out</th>
+            <th class="num" data-col="waste" data-type="num">Waste</th>
+            <th class="num" data-col="usage" data-type="num">Usage</th>
+            <th class="num" data-col="expected" data-type="num">Expected</th>
+            <th class="num" data-col="ending" data-type="num">Ending (SO)</th>
+            <th class="num" data-col="variance" data-type="num">Variance</th>
           </tr>
         </thead>
         <tbody id="resultBody"></tbody>
@@ -162,9 +190,9 @@
 <script src="../shared/local-db.js?v=1"></script>
 <script src="../shared/local-auth.js?v=1"></script>
 <script>window.AUTH_GUARD_DEPTH = 1;</script>
-<script src="../shared/auth-guard.js?v=46"></script>
+<script src="../shared/auth-guard.js?v=47"></script>
 <script src="../shared/seed-data.js?v=31"></script>
 <script src="../shared/ui-dialog.js?v=41"></script>
-<script src="app.js?v=31"></script>
+<script src="app.js?v=34"></script>
 </body>
 </html>
